@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controle de Estoque e Vendas</title>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
+    body { background-color: #f4f7f6; color: #333; padding: 20px; }
+    .container { max-width: 1000px; margin: 0 auto; }
+    h1 { text-align: center; margin-bottom: 20px; color: #2c3e50; }
+    
+    /* Cards de Resumo */
+    .cards { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
+    .card { flex: 1; min-width: 200px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid #3498db; }
+    .card.verde { border-left-color: #2ecc71; }
+    .card.laranja { border-left-color: #e67e22; }
+    .card h3 { font-size: 14px; color: #7f8c8d; text-transform: uppercase; margin-bottom: 5px; }
+    .card p { font-size: 24px; font-weight: bold; color: #2c3e50; }
+
+    /* Painel de Formulário e Tabela */
+    .grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; }
+    @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+
+    .form-container, .table-container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    .form-container h2, .table-container h2 { font-size: 18px; margin-bottom: 15px; color: #34495e; border-bottom: 2px solid #ecf0f1; padding-bottom: 8px; }
+
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
+    select, input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
+    
+    .btn-group { display: flex; gap: 10px; }
+    button { flex: 1; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
+    .btn-venda { background-color: #2ecc71; }
+    .btn-venda:hover { background-color: #27ae60; }
+    .btn-devolucao { background-color: #e74c3c; }
+    .btn-devolucao:hover { background-color: #c0392b; }
+    .btn-salvar { background-color: #3498db; width: 100%; margin-top: 10px; }
+    .btn-salvar:hover { background-color: #2980b9; }
+    .btn-reset { background-color: #7f8c8d; width: 100%; margin-top: 15px; font-size: 12px; padding: 8px; }
+
+    /* Tabela */
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { padding: 12px; text-align: center; border-bottom: 1px solid #ecf0f1; font-size: 14px; }
+    th { background-color: #f8f9fa; color: #7f8c8d; font-weight: 600; }
+    tr:hover { background-color: #f1f2f6; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>👕 Gestão de Lote de Roupas</h1>
+
+  <!-- Cards Financeiros -->
+  <div class="cards">
+    <div class="card laranja">
+      <h3>Estoque Total</h3>
+      <p id="total-estoque">0 peças</p>
+    </div>
+    <div class="card">
+      <h3>Faturamento Total</h3>
+      <p id="total-faturamento">R$ 0,00</p>
+    </div>
+    <div class="card verde">
+      <h3>Lucro Bruto</h3>
+      <p id="total-lucro">R$ 0,00</p>
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- Formulário de Operações -->
+    <div class="form-container">
+      <h2>🛒 Movimentação</h2>
+      <div class="form-group">
+        <label>Tamanho</label>
+        <select id="select-tamanho">
+          <option value="PP">PP</option>
+          <option value="P">P</option>
+          <option value="M">M</option>
+          <option value="G">G</option>
+          <option value="GG">GG</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Quantidade</label>
+        <input type="number" id="qtd-op" value="1" min="1">
+      </div>
+
+      <div class="btn-group">
+        <button class="btn-venda" onclick="registrarVenda()">Vender</button>
+        <button class="btn-devolucao" onclick="registrarDevolucao()">Devolver</button>
+      </div>
+
+      <h2 style="margin-top: 25px;">🏷️ Preços por Tamanho</h2>
+      <div class="form-group">
+        <label>Custo de Compra (R$)</label>
+        <input type="number" id="custo-input" step="0.5" value="20">
+      </div>
+      <div class="form-group">
+        <label>Preço de Venda (R$)</label>
+        <input type="number" id="preco-input" step="0.5" value="45">
+      </div>
+      <button class="btn-salvar" onclick="salvarPrecos()">Salvar Preços do Tamanho</button>
+
+      <button class="btn-reset" onclick="resetarDados()">⚠️ Zerar Tudo / Recomeçar</button>
+    </div>
+
+    <!-- Tabela de Dados -->
+    <div class="table-container">
+      <h2>📊 Resumo por Tamanho</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Tam</th>
+            <th>Estoque</th>
+            <th>Vendas</th>
+            <th>Dev.</th>
+            <th>Preço</th>
+            <th>Lucro</th>
+          </tr>
+        </thead>
+        <tbody id="tabela-corpo"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Dados Padrão (utilizados apenas na primeira vez)
+  const dadosPadrao = {
+    "PP": { estoque: 10, vendas: 0, devolucoes: 0, custo: 20, preco: 45 },
+    "P":  { estoque: 15, vendas: 0, devolucoes: 0, custo: 20, preco: 45 },
+    "M":  { estoque: 20, vendas: 0, devolucoes: 0, custo: 20, preco: 45 },
+    "G":  { estoque: 15, vendas: 0, devolucoes: 0, custo: 22, preco: 50 },
+    "GG": { estoque: 5,  vendas: 0, devolucoes: 0, custo: 22, preco: 50 }
+  };
+
+  // Carrega os dados do localStorage (se existirem) ou usa os dados padrão
+  let dados = JSON.parse(localStorage.getItem("meu_estoque_roupas")) || JSON.parse(JSON.stringify(dadosPadrao));
+
+  function salvarNoNavegador() {
+    localStorage.setItem("meu_estoque_roupas", JSON.stringify(dados));
+  }
+
+  function atualizarInterface() {
+    let tbody = document.getElementById("tabela-corpo");
+    tbody.innerHTML = "";
+
+    let totalEstoque = 0;
+    let totalFaturamento = 0;
+    let totalLucro = 0;
+
+    for (let tam in dados) {
+      let item = dados[tam];
+      let vendasEfetivas = item.vendas - item.devolucoes;
+      let faturamento = vendasEfetivas * item.preco;
+      let custoTotal = vendasEfetivas * item.custo;
+      let lucro = faturamento - custoTotal;
+
+      totalEstoque += item.estoque;
+      totalFaturamento += faturamento;
+      totalLucro += lucro;
+
+      let tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><b>${tam}</b></td>
+        <td>${item.estoque}</td>
+        <td>${item.vendas}</td>
+        <td>${item.devolucoes}</td>
+        <td>R$ ${item.preco.toFixed(2)}</td>
+        <td style="color: ${lucro >= 0 ? '#2ecc71' : '#e74c3c'}; font-weight: bold;">R$ ${lucro.toFixed(2)}</td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    document.getElementById("total-estoque").innerText = totalEstoque + " peças";
+    document.getElementById("total-faturamento").innerText = "R$ " + totalFaturamento.toFixed(2);
+    document.getElementById("total-lucro").innerText = "R$ " + totalLucro.toFixed(2);
+    
+    // Salva automaticamente a cada atualização
+    salvarNoNavegador();
+  }
+
+  function registrarVenda() {
+    let tam = document.getElementById("select-tamanho").value;
+    let qtd = parseInt(document.getElementById("qtd-op").value);
+
+    if (qtd > dados[tam].estoque) {
+      alert("❌ Estoque insuficiente para o tamanho " + tam);
+      return;
+    }
+
+    dados[tam].estoque -= qtd;
+    dados[tam].vendas += qtd;
+    atualizarInterface();
+  }
+
+  function registrarDevolucao() {
+    let tam = document.getElementById("select-tamanho").value;
+    let qtd = parseInt(document.getElementById("qtd-op").value);
+
+    dados[tam].estoque += qtd;
+    dados[tam].devolucoes += qtd;
+    atualizarInterface();
+  }
+
+  function salvarPrecos() {
+    let tam = document.getElementById("select-tamanho").value;
+    let custo = parseFloat(document.getElementById("custo-input").value);
+    let preco = parseFloat(document.getElementById("preco-input").value);
+
+    dados[tam].custo = custo;
+    dados[tam].preco = preco;
+    atualizarInterface();
+    alert("✅ Preços atualizados para o tamanho " + tam);
+  }
+
+  function resetarDados() {
+    if (confirm("Tem certeza que deseja zerar os dados e recomeçar do padrão?")) {
+      dados = JSON.parse(JSON.stringify(dadosPadrao));
+      salvarNoNavegador();
+      atualizarInterface();
+    }
+  }
+
+  // Carregar dados salvos ao abrir a página
+  atualizarInterface();
+</script>
+
+</body>
+</html>
