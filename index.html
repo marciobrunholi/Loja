@@ -2,15 +2,21 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>MK STORE - Gestão de Estoque e Vendas</title>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
     
+    html, body {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden; /* Impede que a página balance/arraste para os lados no telemóvel */
+    }
+
     body {
       background-color: #0f172a;
       color: #f8fafc;
-      padding: 20px;
+      padding: 12px;
       position: relative;
       min-height: 100vh;
     }
@@ -21,31 +27,35 @@
       position: fixed;
       top: 0; left: 0;
       width: 100vw; height: 100vh;
-      font-size: 38px;
+      font-size: 32px;
       font-weight: 900;
       color: rgba(255, 255, 255, 0.02);
-      word-spacing: 25px;
-      line-height: 70px;
-      letter-spacing: 4px;
+      word-spacing: 20px;
+      line-height: 60px;
+      letter-spacing: 2px;
       pointer-events: none;
       z-index: 0;
       overflow: hidden;
       user-select: none;
     }
 
-    .container { max-width: 1300px; margin: 0 auto; position: relative; z-index: 1; }
+    .container { width: 100%; max-width: 1300px; margin: 0 auto; position: relative; z-index: 1; }
 
-    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #334155; }
-    .brand { display: flex; align-items: center; gap: 12px; }
-    .brand-logo { background: linear-gradient(135deg, #3b82f6, #8b5cf6); width: 45px; height: 45px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 20px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
-    h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; color: #f1f5f9; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #334155; }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-logo { background: linear-gradient(135deg, #3b82f6, #8b5cf6); width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+    h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; color: #f1f5f9; }
 
     /* Dashboard Cards */
-    .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
-    .card { background: #1e293b; padding: 18px; border-radius: 12px; border: 1px solid #334155; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-    .card h3 { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-    .card .value { font-size: 22px; font-weight: 700; color: #f8fafc; }
-    .card .subtext { font-size: 12px; margin-top: 4px; font-weight: 600; }
+    .cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
+    @media (max-width: 480px) {
+      .cards-grid { grid-template-columns: 1fr; } /* No telemóvel fica 1 cartão por linha */
+    }
+
+    .card { background: #1e293b; padding: 14px; border-radius: 12px; border: 1px solid #334155; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+    .card h3 { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .card .value { font-size: 20px; font-weight: 700; color: #f8fafc; }
+    .card .subtext { font-size: 11px; margin-top: 4px; font-weight: 600; }
     
     .text-blue { color: #38bdf8; }
     .text-green { color: #4ade80; }
@@ -54,19 +64,19 @@
     .text-yellow { color: #facc15; }
 
     /* Layout Principal */
-    .main-grid { display: grid; grid-template-columns: 340px 1fr; gap: 20px; }
+    .main-grid { display: grid; grid-template-columns: 320px 1fr; gap: 15px; }
     @media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
 
-    .panel { background: #1e293b; border-radius: 12px; padding: 20px; border: 1px solid #334155; }
-    .panel-title { font-size: 16px; font-weight: 700; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #334155; display: flex; align-items: center; gap: 8px; }
+    .panel { background: #1e293b; border-radius: 12px; padding: 15px; border: 1px solid #334155; width: 100%; box-sizing: border-border; }
+    .panel-title { font-size: 15px; font-weight: 700; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #334155; display: flex; align-items: center; gap: 8px; }
 
-    .form-group { margin-bottom: 14px; }
-    label { display: block; margin-bottom: 5px; font-size: 13px; color: #94a3b8; }
-    input, select { width: 100%; padding: 10px 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #f8fafc; font-size: 14px; outline: none; }
+    .form-group { margin-bottom: 12px; }
+    label { display: block; margin-bottom: 4px; font-size: 12px; color: #94a3b8; }
+    input, select { width: 100%; padding: 10px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #f8fafc; font-size: 14px; outline: none; }
     input:focus, select:focus { border-color: #3b82f6; }
 
-    .btn-group { display: flex; gap: 10px; margin-top: 15px; }
-    button { width: 100%; padding: 11px; border: none; border-radius: 8px; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-group { display: flex; gap: 8px; margin-top: 12px; }
+    button { width: 100%; padding: 11px; border: none; border-radius: 8px; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
     .btn-primary { background: #3b82f6; color: white; }
     .btn-primary:hover { background: #2563eb; }
     .btn-success { background: #22c55e; color: white; }
@@ -78,22 +88,29 @@
     .btn-secondary { background: #475569; color: white; }
     .btn-secondary:hover { background: #334155; }
 
-    /* Tabela */
-    .table-container { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
-    th { background: #0f172a; color: #94a3b8; padding: 12px; font-weight: 600; border-bottom: 1px solid #334155; white-space: nowrap; }
-    td { padding: 12px; border-bottom: 1px solid #334155; white-space: nowrap; }
+    /* Tabela isolada para rolagem interna apenas */
+    .table-container {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch; /* Suaviza a rolagem no iPhone/Android */
+      border-radius: 8px;
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; min-width: 650px; }
+    th { background: #0f172a; color: #94a3b8; padding: 10px; font-weight: 600; border-bottom: 1px solid #334155; white-space: nowrap; }
+    td { padding: 10px; border-bottom: 1px solid #334155; white-space: nowrap; }
     tr:hover { background: rgba(255, 255, 255, 0.02); }
 
-    .badge { padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+    .badge { padding: 3px 6px; border-radius: 20px; font-size: 10px; font-weight: 600; }
     .badge-blue { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
     .badge-yellow { background: rgba(234, 179, 8, 0.2); color: #fde047; }
     .badge-green { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
 
     .btn-xs { padding: 4px 8px; font-size: 11px; border-radius: 4px; }
 
-    .tabs { display: flex; gap: 10px; margin-bottom: 15px; }
-    .tab-btn { padding: 8px 16px; background: #0f172a; border: 1px solid #334155; color: #94a3b8; border-radius: 6px; cursor: pointer; width: auto; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+    .tab-btn { padding: 8px 12px; background: #0f172a; border: 1px solid #334155; color: #94a3b8; border-radius: 6px; cursor: pointer; width: auto; font-size: 12px; }
     .tab-btn.active { background: #3b82f6; color: white; border-color: #3b82f6; }
   </style>
 </head>
@@ -105,10 +122,10 @@
       <div class="brand-logo">MK</div>
       <div>
         <h1>MK STORE</h1>
-        <p style="font-size: 12px; color: #94a3b8;">Sistema de Gestão de Lote, Vendas e Logística</p>
+        <p style="font-size: 11px; color: #94a3b8;">Gestão de Estoque e Vendas</p>
       </div>
     </div>
-    <button class="btn-secondary btn-xs" onclick="resetarTudo()" style="width: auto;">⚠️ Zerar Dados</button>
+    <button class="btn-secondary btn-xs" onclick="resetarTudo()" style="width: auto;">⚠️ Zerar</button>
   </header>
 
   <!-- Painel de Métricas Financeiras -->
@@ -116,22 +133,22 @@
     <div class="card">
       <h3>Investimento Total</h3>
       <div class="value text-blue" id="dash-investimento">R$ 0,00</div>
-      <div class="subtext text-blue" id="dash-pecas-totais">0 peças no lote</div>
+      <div class="subtext text-blue" id="dash-pecas-totais">0 peças compradas</div>
     </div>
     <div class="card">
       <h3>Estoque Atual</h3>
       <div class="value text-yellow" id="dash-estoque-qtd">0 peças</div>
-      <div class="subtext text-yellow" id="dash-estoque-valor">R$ 0,00 em produtos</div>
+      <div class="subtext text-yellow" id="dash-estoque-valor">R$ 0,00 em custo</div>
     </div>
     <div class="card">
       <h3>Faturamento Total</h3>
       <div class="value text-orange" id="dash-faturamento">R$ 0,00</div>
-      <div class="subtext text-orange" id="dash-vendas-qtd">0 peças vendidas</div>
+      <div class="subtext text-orange" id="dash-vendas-qtd">0 vendas realizadas</div>
     </div>
     <div class="card">
       <h3>Lucro Acumulado</h3>
       <div class="value text-green" id="dash-lucro">R$ 0,00</div>
-      <div class="subtext text-green" id="dash-roi">ROI Total: 0.0%</div>
+      <div class="subtext text-green" id="dash-roi">ROI: 0.0%</div>
     </div>
   </div>
 
@@ -139,7 +156,7 @@
     <!-- Formulários laterais -->
     <div>
       <!-- Registrar Venda / Devolução -->
-      <div class="panel" style="margin-bottom: 20px;">
+      <div class="panel" style="margin-bottom: 15px;">
         <div class="panel-title">🛒 Movimentação Rápida</div>
         <div class="form-group">
           <label>Selecione a Peça / Tamanho</label>
@@ -237,7 +254,6 @@
 </div>
 
 <script>
-  // Inicialização com Estoque ZERADO
   let produtos = JSON.parse(localStorage.getItem("mk_store_produtos")) || [];
   let pedidos = JSON.parse(localStorage.getItem("mk_store_pedidos")) || [];
 
@@ -290,7 +306,7 @@
     document.getElementById("dash-vendas-qtd").innerText = vendasQtd + " vendas realizadas";
 
     document.getElementById("dash-lucro").innerText = "R$ " + lucroLiquido.toFixed(2);
-    document.getElementById("dash-roi").innerText = "ROI Total: " + roi + "% de retorno";
+    document.getElementById("dash-roi").innerText = "ROI: " + roi + "%";
   }
 
   function renderizarTabelaEstoque() {
@@ -298,7 +314,7 @@
     tbody.innerHTML = "";
 
     if (produtos.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 20px;">Nenhum produto cadastrado no estoque. Adicione peças no formulário ao lado.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 20px;">Nenhum produto cadastrado no estoque. Adicione peças no formulário.</td></tr>`;
       return;
     }
 
@@ -318,7 +334,7 @@
         <td>R$ ${p.custo.toFixed(2)}</td>
         <td>R$ ${p.preco.toFixed(2)}</td>
         <td style="color:#38bdf8; font-weight:bold;">
-          R$ ${lucroUnitarioR$.toFixed(2)} <span style="font-size:11px; color:#94a3b8;">(+${lucroUnitarioMargem}%)</span>
+          R$ ${lucroUnitarioR$.toFixed(2)} <span style="font-size:10px; color:#94a3b8;">(+${lucroUnitarioMargem}%)</span>
         </td>
         <td style="color:${lucroTotalAcumulado >= 0 ? '#4ade80':'#ef4444'}; font-weight:bold;">
           R$ ${lucroTotalAcumulado.toFixed(2)}
@@ -350,7 +366,7 @@
           </span>
         </td>
         <td>
-          ${ped.status === 'A Enviar' ? `<button class="btn-primary btn-xs" onclick="marcarEnviado(${idx})">Marcar Enviado</button>` : '<span style="color:#4ade80;">Concluído</span>'}
+          ${ped.status === 'A Enviar' ? `<button class="btn-primary btn-xs" onclick="marcarEnviado(${idx})">Enviado</button>` : '<span style="color:#4ade80;">OK</span>'}
         </td>
       `;
       tbody.appendChild(tr);
@@ -395,7 +411,6 @@
       return;
     }
 
-    // Busca se já existe este produto especificamente no MESMO tamanho
     let existe = produtos.find(p => p.nome.toLowerCase() === nome.toLowerCase() && p.tamanho === tamanho);
 
     if (existe) {
@@ -417,7 +432,7 @@
 
     salvar();
     document.getElementById("prod-nome").value = "";
-    alert(`✅ ${estoqueIni} peça(s) do produto '${nome}' (Tamanho ${tamanho}) salvas no estoque!`);
+    alert(`✅ ${estoqueIni} peça(s) salva(s) no estoque!`);
   }
 
   function registrarVenda() {
@@ -430,7 +445,7 @@
     if (!p) return;
 
     if (qtd > p.estoque) {
-      alert("❌ Estoque insuficiente para este tamanho!");
+      alert("❌ Estoque insuficiente!");
       return;
     }
 
@@ -446,7 +461,7 @@
     });
 
     salvar();
-    alert("✅ Venda registrada! Pedido adicionado em 'Status de Envio'.");
+    alert("✅ Venda registrada!");
   }
 
   function registrarDevolucao() {
@@ -462,7 +477,7 @@
     p.devolucoes += qtd;
 
     salvar();
-    alert("✅ Devolução registrada e produto retornado ao estoque!");
+    alert("✅ Devolução registrada!");
   }
 
   function marcarEnviado(idx) {
@@ -471,7 +486,7 @@
   }
 
   function excluirProduto(idx) {
-    if (confirm("Deseja remover esta peça do cadastro de estoque?")) {
+    if (confirm("Deseja remover esta peça do estoque?")) {
       produtos.splice(idx, 1);
       salvar();
     }
@@ -486,7 +501,7 @@
   }
 
   function resetarTudo() {
-    if (confirm("Tem certeza que deseja zerar TODOS os dados e recomeçar do zero?")) {
+    if (confirm("Deseja zerar TODOS os dados?")) {
       localStorage.clear();
       produtos = [];
       pedidos = [];
@@ -494,7 +509,6 @@
     }
   }
 
-  // Inicializar
   atualizarTelas();
 </script>
 
