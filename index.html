@@ -1,367 +1,479 @@
-body {
-  background-color: #0f172a;
-  color: #f8fafc;
-  padding: 20px;
-  position: relative;
-  min-height: 100vh;
-}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MK STORE - Gestão de Estoque e Vendas</title>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
+    
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+      padding: 20px;
+      position: relative;
+      min-height: 100vh;
+    }
 
-/* Marca d'água de fundo MK STORE */
-body::before {
-  content: "MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  font-size: 38px;
-  font-weight: 900;
-  color: rgba(255, 255, 255, 0.02);
-  word-spacing: 25px;
-  line-height: 70px;
-  letter-spacing: 4px;
-  pointer-events: none;
-  z-index: 0;
-  overflow: hidden;
-  user-select: none;
-}
+    /* Marca d'água de fundo MK STORE */
+    body::before {
+      content: "MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      font-size: 38px;
+      font-weight: 900;
+      color: rgba(255, 255, 255, 0.02);
+      word-spacing: 25px;
+      line-height: 70px;
+      letter-spacing: 4px;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+      user-select: none;
+    }
 
-.container {
-  max-width: 1280px;
-  margin: 0 auto;
-  position: relative;
-  z-index: 1;
-}
+    .container { max-width: 1280px; margin: 0 auto; position: relative; z-index: 1; }
 
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid #334155;
-}
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #334155; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-logo { background: linear-gradient(135deg, #3b82f6, #8b5cf6); width: 45px; height: 45px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 20px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+    h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; color: #f1f5f9; }
 
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+    /* Dashboard Cards */
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 15px; margin-bottom: 25px; }
+    .card { background: #1e293b; padding: 18px; border-radius: 12px; border: 1px solid #334155; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+    .card h3 { font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .card .value { font-size: 22px; font-weight: 700; color: #f8fafc; }
+    .card .subtext { font-size: 12px; margin-top: 4px; }
+    
+    .text-blue { color: #38bdf8; }
+    .text-green { color: #4ade80; }
+    .text-purple { color: #c084fc; }
+    .text-orange { color: #fb923c; }
+    .text-yellow { color: #facc15; }
 
-.brand-logo {
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-  width: 45px;
-  height: 45px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 900;
-  font-size: 20px;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
+    /* Layout Principal */
+    .main-grid { display: grid; grid-template-columns: 340px 1fr; gap: 20px; }
+    @media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
 
-h1 {
-  font-size: 24px;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-  color: #f1f5f9;
-}
+    .panel { background: #1e293b; border-radius: 12px; padding: 20px; border: 1px solid #334155; }
+    .panel-title { font-size: 16px; font-weight: 700; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #334155; display: flex; align-items: center; gap: 8px; }
 
-/* Dashboard Cards */
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 15px;
-  margin-bottom: 25px;
-}
+    .form-group { margin-bottom: 14px; }
+    label { display: block; margin-bottom: 5px; font-size: 13px; color: #94a3b8; }
+    input, select { width: 100%; padding: 10px 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #f8fafc; font-size: 14px; outline: none; }
+    input:focus, select:focus { border-color: #3b82f6; }
 
-.card {
-  background: #1e293b;
-  padding: 18px;
-  border-radius: 12px;
-  border: 1px solid #334155;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
+    .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+    button { width: 100%; padding: 11px; border: none; border-radius: 8px; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-primary { background: #3b82f6; color: white; }
+    .btn-primary:hover { background: #2563eb; }
+    .btn-success { background: #22c55e; color: white; }
+    .btn-success:hover { background: #16a34a; }
+    .btn-warning { background: #eab308; color: #0f172a; }
+    .btn-warning:hover { background: #ca8a04; }
+    .btn-danger { background: #ef4444; color: white; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-secondary { background: #475569; color: white; }
+    .btn-secondary:hover { background: #334155; }
 
-.card h3 {
-  font-size: 12px;
-  color: #94a3b8;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 8px;
-}
+    /* Tabela */
+    .table-container { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
+    th { background: #0f172a; color: #94a3b8; padding: 12px; font-weight: 600; border-bottom: 1px solid #334155; }
+    td { padding: 12px; border-bottom: 1px solid #334155; }
+    tr:hover { background: rgba(255, 255, 255, 0.02); }
 
-.card .value {
-  font-size: 22px;
-  font-weight: 700;
-  color: #f8fafc;
-}
+    .badge { padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+    .badge-blue { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+    .badge-yellow { background: rgba(234, 179, 8, 0.2); color: #fde047; }
+    .badge-green { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
 
-.card .subtext {
-  font-size: 12px;
-  margin-top: 4px;
-}
+    .actions-flex { display: flex; gap: 5px; }
+    .btn-xs { padding: 4px 8px; font-size: 11px; border-radius: 4px; }
 
-.text-blue { color: #38bdf8; }
-.text-green { color: #4ade80; }
-.text-purple { color: #c084fc; }
-.text-orange { color: #fb923c; }
-.text-yellow { color: #facc15; }
+    .tabs { display: flex; gap: 10px; margin-bottom: 15px; }
+    .tab-btn { padding: 8px 16px; background: #0f172a; border: 1px solid #334155; color: #94a3b8; border-radius: 6px; cursor: pointer; width: auto; }
+    .tab-btn.active { background: #3b82f6; color: white; border-color: #3b82f6; }
+  </style>
+</head>
+<body>
 
-/* Layout Principal */
-.main-grid {
-  display: grid;
-  grid-template-columns: 340px 1fr;
-  gap: 20px;
-}
+<div class="container">
+  <header>
+    <div class="brand">
+      <div class="brand-logo">MK</div>
+      <div>
+        <h1>MK STORE</h1>
+        <p style="font-size: 12px; color: #94a3b8;">Sistema de Gestão de Lote, Vendas e Logística</p>
+      </div>
+    </div>
+    <button class="btn-secondary btn-xs" onclick="resetarTudo()" style="width: auto;">⚠️ Zerar Dados</button>
+  </header>
 
-@media (max-width: 900px) {
-  .main-grid { grid-template-columns: 1fr; }
-}
-
-.panel {
-  background: #1e293b;
-  border-radius: 12px;
-  padding: 20px;
-  border: 1px solid #334155;
-}
-
-.panel-title {
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 15px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #334155;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.form-group {
-  margin-bottom: 14px;
-}
-
-label {
-  display: block;
-  font-size: 13px;
-  color: #94a3b8;
-  margin-bottom: 5px;
-}
-
-input, select {
-  width: 100%;
-  padding: 10px 12px;
-  background: #0f172a;
-  border: 1px solid #334155;
-  border-radius: 8px;
-  color: #f8fafc;
-  font-size: 14px;
-  outline: none;
-}
-
-input:focus, select:focus {
-  border-color: #3b82f6;
-}
-
-.btn-group {
-  display: flex;
-  gap: 10px;
-  margin-top: 15px;
-}
-
-button {
-  width: 100%;
-  padding: 11px;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-primary { background: #3b82f6; color: white; }
-.btn-primary:hover { background: #2563eb; }
-
-.btn-success { background: #22c55e; color: white; }
-.btn-success:hover { background: #16a34a; }
-
-.btn-warning { background: #eab308; color: #0f172a; }
-.btn-warning:hover { background: #ca8a04; }
-
-.btn-danger { background: #ef4444; color: white; }
-.btn-danger:hover { background: #dc2626; }
-
-.btn-secondary { background: #475569; color: white; }
-.btn-secondary:hover { background: #334155; }
-
-/* Tabela */
-.table-container {
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-  text-align: left;
-}
-
-th {
-  background: #0f172a;
-  color: #94a3b8;
-  padding: 12px;
-  font-weight: 600;
-  border-bottom: 1px solid #334155;
-}
-
-td {
-  padding: 12px;
-  border-bottom: 1px solid #334155;
-}
-
-tr:hover {
-  background: rgba(255, 255, 255, 0.02);
-}
-
-.badge {
-  padding: 3px 8px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 600;
-}
-
-.badge-blue { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
-.badge-yellow { background: rgba(234, 179, 8, 0.2); color: #fde047; }
-.badge-green { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
-
-.actions-flex {
-  display: flex;
-  gap: 5px;
-}
-
-.btn-xs {
-  padding: 4px 8px;
-  font-size: 11px;
-  border-radius: 4px;
-}
-
-.tabs {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.tab-btn {
-  padding: 8px 16px;
-  background: #0f172a;
-  border: 1px solid #334155;
-  color: #94a3b8;
-  border-radius: 6px;
-  cursor: pointer;
-  width: auto;
-}
-
-.tab-btn.active {
-  background: #3b82f6;
-  color: white;
-  border-color: #3b82f6;
-}
-
-
-  <div class="form-group">
-    <label>Selecione o Produto</label>
-    <select id="select-produto" onchange="carregarDadosProduto()"></select>
+  <!-- Painel de Métricas Financeiras -->
+  <div class="cards-grid">
+    <div class="card">
+      <h3>Investimento Total</h3>
+      <div class="value text-blue" id="dash-investimento">R$ 0,00</div>
+      <div class="subtext text-blue" id="dash-pecas-totais">0 peças no lote</div>
+    </div>
+    <div class="card">
+      <h3>Estoque Atual</h3>
+      <div class="value text-yellow" id="dash-estoque-qtd">0 peças</div>
+      <div class="subtext text-yellow" id="dash-estoque-valor">R$ 0,00 em produtos</div>
+    </div>
+    <div class="card">
+      <h3>Faturamento Total</h3>
+      <div class="value text-orange" id="dash-faturamento">R$ 0,00</div>
+      <div class="subtext text-orange" id="dash-vendas-qtd">0 peças vendidas</div>
+    </div>
+    <div class="card">
+      <h3>Lucro Líquido</h3>
+      <div class="value text-green" id="dash-lucro">R$ 0,00</div>
+      <div class="subtext text-green" id="dash-roi">ROI: 0%</div>
+    </div>
   </div>
 
-  <div class="form-group">
-    <label>Tamanho</label>
-    <select id="select-tamanho">
-      <option value="PP">PP</option>
-      <option value="P">P</option>
-      <option value="M">M</option>
-      <option value="G">G</option>
-      <option value="GG">GG</option>
-      <option value="Único">Único</option>
-    </select>
-  </div>
+  <div class="main-grid">
+    <!-- Formulários laterais -->
+    <div>
+      <!-- Registrar Venda / Devolução -->
+      <div class="panel" style="margin-bottom: 20px;">
+        <div class="panel-title">🛒 Movimentação Rápida</div>
+        <div class="form-group">
+          <label>Selecione o Produto</label>
+          <select id="select-produto-op" onchange="atualizarComboTamanhos()"></select>
+        </div>
+        <div class="form-group">
+          <label>Tamanho</label>
+          <select id="select-tamanho-op"></select>
+        </div>
+        <div class="form-group">
+          <label>Quantidade</label>
+          <input type="number" id="qtd-op" value="1" min="1">
+        </div>
+        <div class="btn-group">
+          <button class="btn-success" onclick="registrarVenda()">Vender</button>
+          <button class="btn-warning" onclick="registrarDevolucao()">Devolver</button>
+        </div>
+      </div>
 
-  <div class="form-group">
-    <label>Quantidade</label>
-    <input type="number" id="input-qtd" value="1" min="1">
-  </div>
+      <!-- Cadastrar Produto / Ajustar Estoque -->
+      <div class="panel">
+        <div class="panel-title">📦 Cadastrar / Atualizar Peça</div>
+        <div class="form-group">
+          <label>Nome da Peça / Modelo</label>
+          <input type="text" id="prod-nome" placeholder="Ex: Camiseta Oversized">
+        </div>
+        <div class="form-group">
+          <label>Custo de Compra (R$)</label>
+          <input type="number" id="prod-custo" step="0.01" value="25.00">
+        </div>
+        <div class="form-group">
+          <label>Preço de Revenda (R$)</label>
+          <input type="number" id="prod-preco" step="0.01" value="60.00">
+        </div>
+        <div class="form-group">
+          <label>Adicionar Estoque Inicial</label>
+          <input type="number" id="prod-estoque-ini" value="0" min="0">
+        </div>
+        <button class="btn-primary" onclick="cadastrarProduto()">Salvar Produto / Estoque</button>
+      </div>
+    </div>
 
-  <div class="btn-group">
-    <button class="btn-success" onclick="registrarVenda()">🛒 Vender</button>
-    <button class="btn-warning" onclick="registrarDevolucao()">🔄 Devolver</button>
-  </div>
+    <!-- Tabela Principal com Abas -->
+    <div class="panel">
+      <div class="tabs">
+        <button class="tab-btn active" id="btn-tab-estoque" onclick="mudarAba('estoque')">Estoque por Tamanho</button>
+        <button class="tab-btn" id="btn-tab-envio" onclick="mudarAba('envio')">Status de Envio (<span id="count-a-enviar">0</span>)</button>
+      </div>
 
-  <hr style="border-color: #334155; margin: 20px 0;">
+      <!-- Aba 1: Estoque Geral -->
+      <div id="aba-estoque" class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Produto</th>
+              <th>Tam.</th>
+              <th>Estoque</th>
+              <th>Vendas</th>
+              <th>Devol.</th>
+              <th>Custo</th>
+              <th>Revenda</th>
+              <th>Lucro Liq.</th>
+            </tr>
+          </thead>
+          <tbody id="tabela-estoque-corpo"></tbody>
+        </table>
+      </div>
 
-  <div class="panel-title">📦 Cadastrar / Atualizar Peça</div>
-
-  <div class="form-group">
-    <label>Nome da Peça / Modelo</label>
-    <input type="text" id="input-nome-produto" placeholder="Ex: Camiseta Oversized">
-  </div>
-
-  <div class="form-group">
-    <label>Custo de Compra (R$)</label>
-    <input type="number" id="input-custo" step="0.01" placeholder="25.00">
-  </div>
-
-  <div class="form-group">
-    <label>Preço de Revenda (R$)</label>
-    <input type="number" id="input-preco" step="0.01" placeholder="60.00">
-  </div>
-
-  <div class="form-group">
-    <label>Adicionar Estoque Inicial</label>
-    <input type="number" id="input-estoque-add" value="0" min="0">
-  </div>
-
-  <button class="btn-primary" onclick="salvarProduto()">Salvar Produto / Estoque</button>
-</div>
-
-<!-- Tabela e Listagens -->
-<div class="panel">
-  <div class="tabs">
-    <button class="tab-btn active" onclick="mudarAba('estoque')">📦 Estoque por Tamanho</button>
-    <button class="tab-btn" onclick="mudarAba('envios')">🚚 Status de Envio</button>
-  </div>
-
-  <div id="aba-estoque" class="table-container">
-    <table>
-      <thead>
-        <tr>
-          <th>Produto</th>
-          <th>Tam</th>
-          <th>Estoque</th>
-          <th>Vendas</th>
-          <th>Devol.</th>
-          <th>Custo</th>
-          <th>Revenda</th>
-          <th>Lucro Liq.</th>
-        </tr>
-      </thead>
-      <tbody id="tb-estoque"></tbody>
-    </table>
-  </div>
-
-  <div id="aba-envios" class="table-container" style="display: none;">
-    <table>
-      <thead>
-        <tr>
-          <th>Data/Hora</th>
-          <th>Produto</th>
-          <th>Tam</th>
-          <th>Qtd</th>
-          <th>Status</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody id="tb-envios"></tbody>
-    </table>
+      <!-- Aba 2: Gestão de Envios -->
+      <div id="aba-envio" class="table-container" style="display: none;">
+        <table>
+          <thead>
+            <tr>
+              <th>ID Pedido</th>
+              <th>Produto / Tamanho</th>
+              <th>Qtd.</th>
+              <th>Status</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody id="tabela-envios-corpo"></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </div>
+
+<script>
+  // Dados Padrão Iniciais
+  let produtos = JSON.parse(localStorage.getItem("mk_store_produtos")) || [
+    { id: 1, nome: "Conjunto Moletom MK", tamanho: "P", estoque: 10, vendas: 0, devolucoes: 0, custo: 45.00, preco: 110.00 },
+    { id: 2, nome: "Conjunto Moletom MK", tamanho: "M", estoque: 15, vendas: 0, devolucoes: 0, custo: 45.00, preco: 110.00 },
+    { id: 3, nome: "Conjunto Moletom MK", tamanho: "G", estoque: 12, vendas: 0, devolucoes: 0, custo: 45.00, preco: 110.00 },
+    { id: 4, nome: "Camiseta Streetwear", tamanho: "M", estoque: 20, vendas: 0, devolucoes: 0, custo: 20.00, preco: 55.00 },
+    { id: 5, nome: "Camiseta Streetwear", tamanho: "G", estoque: 18, vendas: 0, devolucoes: 0, custo: 20.00, preco: 55.00 }
+  ];
+
+  let pedidos = JSON.parse(localStorage.getItem("mk_store_pedidos")) || [];
+
+  function salvar() {
+    localStorage.setItem("mk_store_produtos", JSON.stringify(produtos));
+    localStorage.setItem("mk_store_pedidos", JSON.stringify(pedidos));
+    atualizarTelas();
+  }
+
+  function atualizarTelas() {
+    renderizarDashboard();
+    renderizarTabelaEstoque();
+    renderizarTabelaEnvios();
+    atualizarSelects();
+  }
+
+  function renderizarDashboard() {
+    let investTotal = 0;
+    let pecasTotais = 0;
+    let estoqueQtd = 0;
+    let estoqueValor = 0;
+    let faturamento = 0;
+    let vendasQtd = 0;
+    let custoVendido = 0;
+
+    produtos.forEach(p => {
+      let pecasProduto = p.estoque + p.vendas - p.devolucoes;
+      investTotal += pecasProduto * p.custo;
+      pecasTotais += pecasProduto;
+
+      estoqueQtd += p.estoque;
+      estoqueValor += p.estoque * p.custo;
+
+      let vendasLiquidas = p.vendas - p.devolucoes;
+      faturamento += vendasLiquidas * p.preco;
+      custoVendido += vendasLiquidas * p.custo;
+      vendasQtd += vendasLiquidas;
+    });
+
+    let lucroLiquido = faturamento - custoVendido;
+    let roi = investTotal > 0 ? ((lucroLiquido / investTotal) * 100).toFixed(1) : 0;
+
+    document.getElementById("dash-investimento").innerText = "R$ " + investTotal.toFixed(2);
+    document.getElementById("dash-pecas-totais").innerText = pecasTotais + " peças no lote total";
+
+    document.getElementById("dash-estoque-qtd").innerText = estoqueQtd + " peças";
+    document.getElementById("dash-estoque-valor").innerText = "R$ " + estoqueValor.toFixed(2) + " em custo";
+
+    document.getElementById("dash-faturamento").innerText = "R$ " + faturamento.toFixed(2);
+    document.getElementById("dash-vendas-qtd").innerText = vendasQtd + " vendas realizadas";
+
+    document.getElementById("dash-lucro").innerText = "R$ " + lucroLiquido.toFixed(2);
+    document.getElementById("dash-roi").innerText = "ROI: " + roi + "% de retorno";
+  }
+
+  function renderizarTabelaEstoque() {
+    let tbody = document.getElementById("tabela-estoque-corpo");
+    tbody.innerHTML = "";
+
+    produtos.forEach(p => {
+      let vLiquidas = p.vendas - p.devolucoes;
+      let lucro = (vLiquidas * p.preco) - (vLiquidas * p.custo);
+
+      let tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><b>${p.nome}</b></td>
+        <td><span class="badge badge-blue">${p.tamanho}</span></td>
+        <td>${p.estoque}</td>
+        <td>${p.vendas}</td>
+        <td>${p.devolucoes}</td>
+        <td>R$ ${p.custo.toFixed(2)}</td>
+        <td>R$ ${p.preco.toFixed(2)}</td>
+        <td style="color:${lucro >= 0 ? '#4ade80':'#ef4444'}; font-weight:bold;">R$ ${lucro.toFixed(2)}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function renderizarTabelaEnvios() {
+    let tbody = document.getElementById("tabela-envios-corpo");
+    tbody.innerHTML = "";
+    let aEnviarCount = 0;
+
+    pedidos.forEach((ped, idx) => {
+      if (ped.status === "A Enviar") aEnviarCount++;
+
+      let tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>#${ped.id}</td>
+        <td><b>${ped.produto}</b> (${ped.tamanho})</td>
+        <td>${ped.qtd}</td>
+        <td>
+          <span class="badge ${ped.status === 'A Enviar' ? 'badge-yellow' : 'badge-green'}">
+            ${ped.status}
+          </span>
+        </td>
+        <td>
+          ${ped.status === 'A Enviar' ? `<button class="btn-primary btn-xs" onclick="marcarEnviado(${idx})">Marcar Enviado</button>` : '<span>OK</span>'}
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById("count-a-enviar").innerText = aEnviarCount;
+  }
+
+  function atualizarSelects() {
+    let selectProd = document.getElementById("select-produto-op");
+    let nomes = [...new Set(produtos.map(p => p.nome))];
+    
+    selectProd.innerHTML = "";
+    nomes.forEach(nome => {
+      let opt = document.createElement("option");
+      opt.value = nome;
+      opt.innerText = nome;
+      selectProd.appendChild(opt);
+    });
+
+    atualizarComboTamanhos();
+  }
+
+  function atualizarComboTamanhos() {
+    let nome = document.getElementById("select-produto-op").value;
+    let selectTam = document.getElementById("select-tamanho-op");
+    selectTam.innerHTML = "";
+
+    let prodsFiltrados = produtos.filter(p => p.nome === nome);
+    prodsFiltrados.forEach(p => {
+      let opt = document.createElement("option");
+      opt.value = p.tamanho;
+      opt.innerText = p.tamanho + " (Estoque: " + p.estoque + ")";
+      selectTam.appendChild(opt);
+    });
+  }
+
+  function registrarVenda() {
+    let nome = document.getElementById("select-produto-op").value;
+    let tam = document.getElementById("select-tamanho-op").value;
+    let qtd = parseInt(document.getElementById("qtd-op").value);
+
+    let p = produtos.find(item => item.nome === nome && item.tamanho === tam);
+    if (!p) return;
+
+    if (qtd > p.estoque) {
+      alert("❌ Estoque insuficiente!");
+      return;
+    }
+
+    p.estoque -= qtd;
+    p.vendas += qtd;
+
+    pedidos.unshift({
+      id: Math.floor(1000 + Math.random() * 9000),
+      produto: nome,
+      tamanho: tam,
+      qtd: qtd,
+      status: "A Enviar"
+    });
+
+    salvar();
+    alert("✅ Venda registrada! Pedido adicionado na aba 'Status de Envio'.");
+  }
+
+  function registrarDevolucao() {
+    let nome = document.getElementById("select-produto-op").value;
+    let tam = document.getElementById("select-tamanho-op").value;
+    let qtd = parseInt(document.getElementById("qtd-op").value);
+
+    let p = produtos.find(item => item.nome === nome && item.tamanho === tam);
+    if (!p) return;
+
+    p.estoque += qtd;
+    p.devolucoes += qtd;
+
+    salvar();
+    alert("✅ Devolução registrada no estoque!");
+  }
+
+  function marcarEnviado(idx) {
+    pedidos[idx].status = "Enviado";
+    salvar();
+  }
+
+  function cadastrarProduto() {
+    let nome = document.getElementById("prod-nome").value.trim();
+    let custo = parseFloat(document.getElementById("prod-custo").value);
+    let preco = parseFloat(document.getElementById("prod-preco").value);
+    let estoqueIni = parseInt(document.getElementById("prod-estoque-ini").value);
+
+    if (!nome) {
+      alert("Informe o nome do produto!");
+      return;
+    }
+
+    let tamanhosPadrao = ["PP", "P", "M", "G", "GG"];
+    tamanhosPadrao.forEach(t => {
+      let existe = produtos.find(p => p.nome === nome && p.tamanho === t);
+      if (existe) {
+        existe.custo = custo;
+        existe.preco = preco;
+        if (estoqueIni > 0) existe.estoque += estoqueIni;
+      } else {
+        produtos.push({
+          id: Date.now() + Math.random(),
+          nome: nome,
+          tamanho: t,
+          estoque: estoqueIni,
+          vendas: 0,
+          devolucoes: 0,
+          custo: custo,
+          preco: preco
+        });
+      }
+    });
+
+    salvar();
+    alert("✅ Produto cadastrado/atualizado com sucesso!");
+  }
+
+  function mudarAba(aba) {
+    document.getElementById("aba-estoque").style.display = aba === 'estoque' ? 'block' : 'none';
+    document.getElementById("aba-envio").style.display = aba === 'envio' ? 'block' : 'none';
+    
+    document.getElementById("btn-tab-estoque").classList.toggle("active", aba === 'estoque');
+    document.getElementById("btn-tab-envio").classList.toggle("active", aba === 'envio');
+  }
+
+  function resetarTudo() {
+    if (confirm("Tem certeza que deseja zerar todos os dados do sistema?")) {
+      localStorage.clear();
+      location.reload();
+    }
+  }
+
+  // Inicializar
+  atualizarTelas();
+</script>
+
+</body>
+</html>
