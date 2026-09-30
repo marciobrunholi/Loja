@@ -35,14 +35,17 @@
 
     .container { width: 100%; max-width: 1400px; margin: 0 auto; position: relative; z-index: 1; }
 
-    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #334155; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 12px; border-bottom: 1px solid #334155; }
     .brand { display: flex; align-items: center; gap: 10px; }
     .brand-logo { background: linear-gradient(135deg, #3b82f6, #8b5cf6); width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
     h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; color: #f1f5f9; }
 
     .status-online { font-size: 11px; background: rgba(34, 197, 94, 0.2); color: #4ade80; padding: 4px 8px; border-radius: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
 
-    /* Dashboard Cards - Módulos Financeiros Avançados */
+    /* Alerta de Caixa Negativo */
+    .alert-banner { display: none; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #f87171; padding: 10px 15px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; font-weight: 600; text-align: center; }
+
+    /* Dashboard Cards */
     .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 20px; }
 
     .card { background: #1e293b; padding: 14px; border-radius: 12px; border: 1px solid #334155; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
@@ -57,12 +60,16 @@
     .text-yellow { color: #facc15; }
     .text-red { color: #f87171; }
 
-    /* Layout Principal */
-    .main-grid { display: grid; grid-template-columns: 350px 1fr; gap: 15px; }
-    @media (max-width: 950px) { .main-grid { grid-template-columns: 1fr; } }
+    /* Layout Lado a Lado para Entradas Principais */
+    .top-forms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+    @media (max-width: 850px) { .top-forms-grid { grid-template-columns: 1fr; } }
+
+    /* Layout Inferior */
+    .bottom-forms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+    @media (max-width: 850px) { .bottom-forms-grid { grid-template-columns: 1fr; } }
 
     .panel { background: #1e293b; border-radius: 12px; padding: 15px; border: 1px solid #334155; width: 100%; margin-bottom: 15px; }
-    .panel-title { font-size: 14px; font-weight: 700; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #334155; display: flex; align-items: center; gap: 8px; }
+    .panel-title { font-size: 14px; font-weight: 700; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #334155; display: flex; align-items: center; justify-content: space-between; }
 
     .form-group { margin-bottom: 12px; }
     label { display: block; margin-bottom: 4px; font-size: 12px; color: #94a3b8; }
@@ -108,6 +115,7 @@
     .badge-green { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
     .badge-purple { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
     .badge-orange { background: rgba(249, 115, 22, 0.2); color: #fb923c; }
+    .badge-red { background: rgba(239, 68, 68, 0.2); color: #f87171; }
 
     .btn-xs { padding: 4px 8px; font-size: 11px; border-radius: 6px; width: auto; }
 
@@ -130,6 +138,11 @@
     <button class="btn-secondary btn-xs" onclick="resetarTudo()">⚠️ Zerar Tudo</button>
   </header>
 
+  <!-- Banner de Alerta de Caixa Negativo -->
+  <div class="alert-banner" id="banner-caixa-negativo">
+    🚨 ATENÇÃO: O caixa real acumulado está negativo! As saídas/despesas superam os valores recebidos confirmados.
+  </div>
+
   <!-- Painel de Métricas Financeiras -->
   <div class="cards-grid">
     <div class="card">
@@ -145,7 +158,7 @@
     <div class="card">
       <h3>A Receber (Plataformas)</h3>
       <div class="value text-orange" id="dash-a-receber">R$ 0,00</div>
-      <div class="subtext text-orange" id="dash-a-receber-detalhe">Shopee: R$ 0 | TikTok: R$ 0</div>
+      <div class="subtext text-orange" id="dash-a-receber-detalhe">TikTok: R$ 0 | Shopee: R$ 0</div>
     </div>
     <div class="card">
       <h3>Valores Recebidos (Caixa)</h3>
@@ -164,194 +177,242 @@
     </div>
   </div>
 
-  <div class="main-grid">
-    <!-- Formulários Laterais -->
-    <div>
-      <!-- Registrar Venda / Devolução -->
-      <div class="panel">
-        <div class="panel-title">🛒 Movimentação de Vendas</div>
-        <div class="form-group">
-          <label>Selecione a Peça / Tamanho</label>
-          <select id="select-produto-op" onchange="atualizarPrecoVendaSugerido()"></select>
-        </div>
-        <div class="form-group">
-          <label>Canal de Venda</label>
-          <select id="canal-venda">
-            <option value="Shopee">Shopee (A Receber)</option>
-            <option value="TikTok">TikTok Shop (A Receber)</option>
-            <option value="Loja Física">Loja Física (Recebido em Caixa)</option>
-            <option value="Outro">Outro Canal</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Preço Praticado (Unitário R$)</label>
-          <input type="number" id="preco-venda-efetivo" step="0.01" value="0.00">
-        </div>
-        <div class="form-group">
-          <label>Quantidade</label>
-          <input type="number" id="qtd-op" value="1" min="1">
-        </div>
-        <div class="btn-group">
-          <button class="btn-success" onclick="registrarVenda()">Registrar Venda</button>
-          <button class="btn-warning" onclick="registrarDevolucao()">Devolver Item</button>
-        </div>
+  <!-- Formulários Principais (Lado a Lado no Topo) -->
+  <div class="top-forms-grid">
+    <!-- Registrar Venda / Devolução -->
+    <div class="panel" style="margin-bottom:0;">
+      <div class="panel-title">🛒 Movimentação de Vendas</div>
+      <div class="form-group">
+        <label>Selecione a Peça / Tamanho</label>
+        <select id="select-produto-op" onchange="atualizarPrecoVendaSugerido()"></select>
       </div>
-
-      <!-- Lançar Repasse Diário de Plataforma -->
-      <div class="panel">
-        <div class="panel-title">💵 Lançar Repasse Recebido</div>
-        <div class="form-group">
-          <label>Plataforma Pagadora</label>
-          <select id="repasse-plataforma">
-            <option value="Shopee">Shopee</option>
-            <option value="TikTok">TikTok Shop</option>
-            <option value="Outro">Outro Canal Online</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Valor Depositado / Recebido (R$)</label>
-          <input type="number" id="repasse-valor" step="0.01" placeholder="Ex: 150.00">
-        </div>
-        <button class="btn-primary" onclick="lancarRepassePlataforma()">Confirmar Repasse no Caixa</button>
+      <div class="form-group">
+        <label>Canal de Venda</label>
+        <select id="canal-venda">
+          <option value="TikTok">TikTok Shop (A Receber)</option>
+          <option value="Loja Física">Loja Física (Recebido em Caixa)</option>
+          <option value="Shopee">Shopee (A Receber)</option>
+          <option value="Outro">Outro Canal</option>
+        </select>
       </div>
-
-      <!-- Cadastrar Gastos Diversos -->
-      <div class="panel">
-        <div class="panel-title">💸 Gastos Diversos da Loja</div>
-        <div class="form-group">
-          <label>Descrição da Despesa</label>
-          <input type="text" id="gasto-descricao" placeholder="Ex: Sacolas, Frete, Embalagens">
-        </div>
-        <div class="form-group">
-          <label>Valor do Gasto (R$)</label>
-          <input type="number" id="gasto-valor" step="0.01" placeholder="Ex: 45.00">
-        </div>
-        <button class="btn-danger" onclick="cadastrarGasto()">Lançar Despesa</button>
+      <div class="form-group">
+        <label>Preço Praticado (Unitário R$)</label>
+        <input type="number" id="preco-venda-efetivo" step="0.01" value="0.00">
       </div>
-
-      <!-- Cadastrar Peça -->
-      <div class="panel">
-        <div class="panel-title">📦 Cadastrar / Adicionar Peça</div>
-        <div class="form-group">
-          <label>Nome da Peça / Modelo</label>
-          <input type="text" id="prod-nome" placeholder="Ex: Camiseta Oversized">
-        </div>
-        <div class="form-group">
-          <label>Tamanho Específico</label>
-          <select id="prod-tamanho">
-            <option value="PP">PP</option>
-            <option value="P">P</option>
-            <option value="M">M</option>
-            <option value="G">G</option>
-            <option value="GG">GG</option>
-            <option value="Único">Único</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Custo de Compra (R$)</label>
-          <input type="number" id="prod-custo" step="0.01" value="25.00">
-        </div>
-        <div class="form-group">
-          <label>Preço Padrão de Revenda (R$)</label>
-          <input type="number" id="prod-preco" step="0.01" value="60.00">
-        </div>
-        <div class="form-group">
-          <label>Quantidade em Estoque</label>
-          <input type="number" id="prod-estoque-ini" value="1" min="1">
-        </div>
-        <button class="btn-primary" onclick="cadastrarProduto()">Salvar Peça no Estoque</button>
+      <div class="form-group">
+        <label>Quantidade</label>
+        <input type="number" id="qtd-op" value="1" min="1">
+      </div>
+      <div class="btn-group">
+        <button class="btn-success" onclick="registrarVenda()">Registrar Venda</button>
+        <button class="btn-warning" onclick="registrarDevolucao()">Devolver Item</button>
       </div>
     </div>
 
-    <!-- Tabela Principal com Abas -->
+    <!-- Cadastrar Peça -->
+    <div class="panel" style="margin-bottom:0;">
+      <div class="panel-title">📦 Cadastrar / Adicionar Peça</div>
+      <div class="form-group">
+        <label>Nome da Peça / Modelo</label>
+        <input type="text" id="prod-nome" placeholder="Ex: Camiseta Oversized">
+      </div>
+      <div class="form-group">
+        <label>Tamanho Específico</label>
+        <select id="prod-tamanho">
+          <option value="PP">PP</option>
+          <option value="P">P</option>
+          <option value="M">M</option>
+          <option value="G">G</option>
+          <option value="GG">GG</option>
+          <option value="Único">Único</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Custo de Compra (R$)</label>
+        <input type="number" id="prod-custo" step="0.01" value="25.00">
+      </div>
+      <div class="form-group">
+        <label>Preço Padrão de Revenda (R$)</label>
+        <input type="number" id="prod-preco" step="0.01" value="60.00">
+      </div>
+      <div class="form-group">
+        <label>Quantidade em Estoque</label>
+        <input type="number" id="prod-estoque-ini" value="1" min="1">
+      </div>
+      <button class="btn-primary" onclick="cadastrarProduto()">Salvar Peça no Estoque</button>
+    </div>
+  </div>
+
+  <!-- Central de Visualizações e Relatórios (Painel com Abas) -->
+  <div class="panel">
+    <div class="tabs">
+      <button class="tab-btn active" id="btn-tab-estoque" onclick="mudarAba('estoque')">Estoque Detalhado</button>
+      <button class="tab-btn" id="btn-tab-vendas" onclick="mudarAba('vendas')">Vendas & Financeiro</button>
+      <button class="tab-btn" id="btn-tab-gastos" onclick="mudarAba('gastos')">Gastos Diversos</button>
+      <button class="tab-btn" id="btn-tab-envio" onclick="mudarAba('envio')">Status de Envio (<span id="count-a-enviar">0</span>)</button>
+      <button class="tab-btn" id="btn-tab-relatorios" onclick="mudarAba('relatorios')">📊 Relatórios</button>
+    </div>
+
+    <!-- Aba 1: Estoque Geral -->
+    <div id="aba-estoque">
+      <div class="table-container table-desktop">
+        <table>
+          <thead>
+            <tr>
+              <th>Produto</th>
+              <th>Tam.</th>
+              <th>Estoque</th>
+              <th>Vendas por Canal</th>
+              <th>Devolvidos</th>
+              <th>Custo Un.</th>
+              <th>Preço Padrão</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody id="tabela-estoque-corpo"></tbody>
+        </table>
+      </div>
+      <div class="mobile-cards" id="mobile-estoque-corpo"></div>
+    </div>
+
+    <!-- Aba 2: Gestão de Vendas / Financeiro -->
+    <div id="aba-vendas" style="display: none;">
+      <div class="table-container table-desktop">
+        <table>
+          <thead>
+            <tr>
+              <th>ID / Data</th>
+              <th>Produto / Tam</th>
+              <th>Canal</th>
+              <th>Qtd.</th>
+              <th>Valor Total</th>
+              <th>Status Pgto.</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tabela-vendas-corpo"></tbody>
+        </table>
+      </div>
+      <div class="mobile-cards" id="mobile-vendas-corpo"></div>
+    </div>
+
+    <!-- Aba 3: Gastos Diversos -->
+    <div id="aba-gastos" style="display: none;">
+      <div class="table-container table-desktop">
+        <table>
+          <thead>
+            <tr>
+              <th>ID / Data</th>
+              <th>Descrição do Gasto</th>
+              <th>Valor (R$)</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tabela-gastos-corpo"></tbody>
+        </table>
+      </div>
+      <div class="mobile-cards" id="mobile-gastos-corpo"></div>
+    </div>
+
+    <!-- Aba 4: Gestão de Envios -->
+    <div id="aba-envio" style="display: none;">
+      <div class="table-container table-desktop">
+        <table>
+          <thead>
+            <tr>
+              <th>ID Pedido</th>
+              <th>Produto / Tamanho</th>
+              <th>Canal</th>
+              <th>Qtd.</th>
+              <th>Status Logístico</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody id="tabela-envios-corpo"></tbody>
+        </table>
+      </div>
+      <div class="mobile-cards" id="mobile-envios-corpo"></div>
+    </div>
+
+    <!-- Aba 5: Relatórios e Períodos -->
+    <div id="aba-relatorios" style="display: none;">
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:15px; align-items:flex-end;">
+        <div>
+          <label>Filtro Rápido:</label>
+          <select id="relatorio-periodo-tipo" onchange="selecionarFiltroRelatorio()" style="width: auto;">
+            <option value="hoje">Hoje</option>
+            <option value="semana">Últimos 7 dias</option>
+            <option value="mes" selected>Mês Atual</option>
+            <option value="custom">Personalizado</option>
+          </select>
+        </div>
+        <div id="box-datas-custom" style="display:none; gap:10px;">
+          <div>
+            <label>Data Início:</label>
+            <input type="date" id="relatorio-data-inicio">
+          </div>
+          <div>
+            <label>Data Fim:</label>
+            <input type="date" id="relatorio-data-fim">
+          </div>
+        </div>
+        <button class="btn-primary btn-xs" style="height:38px; padding:0 15px;" onclick="gerarRelatorio()">Filtrar Relatório</button>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card">
+          <h3>Faturamento no Período</h3>
+          <div class="value text-orange" id="rel-faturamento">R$ 0,00</div>
+          <div class="subtext text-orange" id="rel-vendas-qtd">0 vendas</div>
+        </div>
+        <div class="card">
+          <h3>Custo das Peças Vendidas</h3>
+          <div class="value text-yellow" id="rel-custo-pecas">R$ 0,00</div>
+        </div>
+        <div class="card">
+          <h3>Gastos Operacionais</h3>
+          <div class="value text-red" id="rel-gastos">R$ 0,00</div>
+        </div>
+        <div class="card">
+          <h3>Lucro Líquido do Período</h3>
+          <div class="value text-green" id="rel-lucro">R$ 0,00</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulários Inferiores (Lançar Recebidos e Gastos Diversos) -->
+  <div class="bottom-forms-grid">
+    <!-- Lançar Repasse Diário de Plataforma -->
     <div class="panel">
-      <div class="tabs">
-        <button class="tab-btn active" id="btn-tab-estoque" onclick="mudarAba('estoque')">Estoque Detalhado</button>
-        <button class="tab-btn" id="btn-tab-vendas" onclick="mudarAba('vendas')">Vendas & Financeiro</button>
-        <button class="tab-btn" id="btn-tab-gastos" onclick="mudarAba('gastos')">Gastos Diversos</button>
-        <button class="tab-btn" id="btn-tab-envio" onclick="mudarAba('envio')">Status de Envio (<span id="count-a-enviar">0</span>)</button>
+      <div class="panel-title">💵 Lançar Repasse Recebido (Plataformas)</div>
+      <div class="form-group">
+        <label>Plataforma Pagadora</label>
+        <select id="repasse-plataforma">
+          <option value="TikTok">TikTok Shop</option>
+          <option value="Shopee">Shopee</option>
+          <option value="Outro">Outro Canal Online</option>
+        </select>
       </div>
+      <div class="form-group">
+        <label>Valor Depositado / Recebido (R$)</label>
+        <input type="number" id="repasse-valor" step="0.01" placeholder="Ex: 150.00">
+      </div>
+      <button class="btn-primary" onclick="lancarRepassePlataforma()">Confirmar Repasse no Caixa</button>
+    </div>
 
-      <!-- Aba 1: Estoque Geral -->
-      <div id="aba-estoque">
-        <div class="table-container table-desktop">
-          <table>
-            <thead>
-              <tr>
-                <th>Produto</th>
-                <th>Tam.</th>
-                <th>Estoque</th>
-                <th>Vendas</th>
-                <th>Dev.</th>
-                <th>Custo Un.</th>
-                <th>Preço Padrão</th>
-                <th>Ação</th>
-              </tr>
-            </thead>
-            <tbody id="tabela-estoque-corpo"></tbody>
-          </table>
-        </div>
-        <div class="mobile-cards" id="mobile-estoque-corpo"></div>
+    <!-- Cadastrar Gastos Diversos -->
+    <div class="panel">
+      <div class="panel-title">💸 Gastos Diversos da Loja</div>
+      <div class="form-group">
+        <label>Descrição da Despesa</label>
+        <input type="text" id="gasto-descricao" placeholder="Ex: Sacolas, Frete, Fita adesiva">
       </div>
-
-      <!-- Aba 2: Gestão de Vendas / Financeiro -->
-      <div id="aba-vendas" style="display: none;">
-        <div class="table-container table-desktop">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Produto / Tam</th>
-                <th>Canal</th>
-                <th>Qtd.</th>
-                <th>Valor Total</th>
-                <th>Status Pgto.</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody id="tabela-vendas-corpo"></tbody>
-          </table>
-        </div>
-        <div class="mobile-cards" id="mobile-vendas-corpo"></div>
+      <div class="form-group">
+        <label>Valor do Gasto (R$)</label>
+        <input type="number" id="gasto-valor" step="0.01" placeholder="Ex: 45.00">
       </div>
-
-      <!-- Aba 3: Gastos Diversos -->
-      <div id="aba-gastos" style="display: none;">
-        <div class="table-container table-desktop">
-          <table>
-            <thead>
-              <tr>
-                <th>Data/ID</th>
-                <th>Descrição do Gasto</th>
-                <th>Valor (R$)</th>
-                <th>Ação</th>
-              </tr>
-            </thead>
-            <tbody id="tabela-gastos-corpo"></tbody>
-          </table>
-        </div>
-        <div class="mobile-cards" id="mobile-gastos-corpo"></div>
-      </div>
-
-      <!-- Aba 4: Gestão de Envios -->
-      <div id="aba-envio" style="display: none;">
-        <div class="table-container table-desktop">
-          <table>
-            <thead>
-              <tr>
-                <th>ID Pedido</th>
-                <th>Produto / Tamanho</th>
-                <th>Canal</th>
-                <th>Qtd.</th>
-                <th>Status Logístico</th>
-                <th>Ação</th>
-              </tr>
-            </thead>
-            <tbody id="tabela-envios-corpo"></tbody>
-          </table>
-        </div>
-        <div class="mobile-cards" id="mobile-envios-corpo"></div>
-      </div>
+      <button class="btn-danger" onclick="cadastrarGasto()">Lançar Despesa</button>
     </div>
   </div>
 </div>
@@ -411,6 +472,7 @@
     renderizarTabelaGastos();
     renderizarTabelaEnvios();
     atualizarSelects();
+    gerarRelatorio();
   }
 
   function renderizarDashboard() {
@@ -419,8 +481,8 @@
     let estoqueQtd = 0;
     let estoqueValor = 0;
 
-    let aReceberShopee = 0;
     let aReceberTikTok = 0;
+    let aReceberShopee = 0;
     let aReceberOutros = 0;
 
     let valorRecebido = 0;
@@ -444,8 +506,8 @@
       custoVendidoTotal += custoPedido;
 
       if (ped.statusPgto === "A Receber") {
-        if (ped.canal === "Shopee") aReceberShopee += totalPedido;
-        else if (ped.canal === "TikTok") aReceberTikTok += totalPedido;
+        if (ped.canal === "TikTok") aReceberTikTok += totalPedido;
+        else if (ped.canal === "Shopee") aReceberShopee += totalPedido;
         else aReceberOutros += totalPedido;
       } else {
         valorRecebido += totalPedido;
@@ -453,9 +515,18 @@
     });
 
     let totalGastos = gastos.reduce((sum, g) => sum + g.valor, 0);
-    let totalAReceber = aReceberShopee + aReceberTikTok + aReceberOutros;
+    let totalAReceber = aReceberTikTok + aReceberShopee + aReceberOutros;
 
-    // Lucro Líquido Real = Faturamento Total - Custo dos Produtos Vendidos - Gastos Operacionais
+    // Caixa Real Líquido = Entradas em Caixa - Despesas Operacionais
+    let caixaLiquidoReal = valorRecebido - totalGastos;
+    let bannerCaixa = document.getElementById("banner-caixa-negativo");
+
+    if (caixaLiquidoReal < 0) {
+      bannerCaixa.style.display = "block";
+    } else {
+      bannerCaixa.style.display = "none";
+    }
+
     let lucroLiquido = faturamentoTotalGeral - custoVendidoTotal - totalGastos;
     let roi = investTotal > 0 ? ((lucroLiquido / investTotal) * 100).toFixed(1) : "0.0";
 
@@ -466,7 +537,7 @@
     document.getElementById("dash-estoque-valor").innerText = "R$ " + estoqueValor.toFixed(2) + " em custo";
 
     document.getElementById("dash-a-receber").innerText = "R$ " + totalAReceber.toFixed(2);
-    document.getElementById("dash-a-receber-detalhe").innerText = `Shopee: R$ ${aReceberShopee.toFixed(2)} | TikTok: R$ ${aReceberTikTok.toFixed(2)}`;
+    document.getElementById("dash-a-receber-detalhe").innerText = `TikTok: R$ ${aReceberTikTok.toFixed(2)} | Shopee: R$ ${aReceberShopee.toFixed(2)}`;
 
     document.getElementById("dash-recebido").innerText = "R$ " + valorRecebido.toFixed(2);
 
@@ -490,12 +561,30 @@
     }
 
     produtos.forEach((p, idx) => {
+      // Contagem de vendas por canal
+      let vTikTok = 0, vLoja = 0, vShopee = 0, vOutro = 0;
+      pedidos.filter(ped => ped.produto === p.nome && ped.tamanho === p.tamanho).forEach(ped => {
+        if (ped.canal === "TikTok") vTikTok += ped.qtd;
+        else if (ped.canal === "Loja Física") vLoja += ped.qtd;
+        else if (ped.canal === "Shopee") vShopee += ped.qtd;
+        else vOutro += ped.qtd;
+      });
+
+      let badgeEstoque = p.estoque <= 3 ? '<span class="badge badge-yellow">⚠️ Baixo Estoque</span>' : '';
+
       let tr = document.createElement("tr");
       tr.innerHTML = `
-        <td><b>${p.nome}</b></td>
+        <td><b>${p.nome}</b> ${badgeEstoque}</td>
         <td><span class="badge badge-blue">${p.tamanho}</span></td>
-        <td><b>${p.estoque}</b></td>
-        <td>${p.vendas}</td>
+        <td><b style="color:${p.estoque <= 3 ? '#facc15' : '#f8fafc'}">${p.estoque}</b></td>
+        <td>
+          <small>
+            <span class="badge badge-purple">TikTok: ${vTikTok}</span>
+            <span class="badge badge-green">Loja: ${vLoja}</span>
+            <span class="badge badge-orange">Shopee: ${vShopee}</span>
+            ${vOutro > 0 ? `<span class="badge badge-blue">Outro: ${vOutro}</span>` : ''}
+          </small>
+        </td>
         <td>${p.devolucoes}</td>
         <td>R$ ${p.custo.toFixed(2)}</td>
         <td>R$ ${p.preco.toFixed(2)}</td>
@@ -509,11 +598,12 @@
       card.className = "mobile-item";
       card.innerHTML = `
         <div class="mobile-item-header">
-          <div><b>${p.nome}</b> <span class="badge badge-blue">${p.tamanho}</span></div>
+          <div><b>${p.nome}</b> <span class="badge badge-blue">${p.tamanho}</span> ${badgeEstoque}</div>
           <button class="btn-danger btn-xs" onclick="window.excluirQuantidade(${idx})">Excluir</button>
         </div>
         <div class="mobile-row"><span>Estoque Atual:</span> <b>${p.estoque} peças</b></div>
-        <div class="mobile-row"><span>Vendas / Devoluções:</span> <b>${p.vendas} / ${p.devolucoes}</b></div>
+        <div class="mobile-row"><span>Vendas por Canal:</span> <b>TikTok:${vTikTok} | Loja:${vLoja} | Shopee:${vShopee}</b></div>
+        <div class="mobile-row"><span>Devoluções:</span> <b>${p.devolucoes} peças</b></div>
         <div class="mobile-row"><span>Custo / Preço Padrão:</span> <b>R$ ${p.custo.toFixed(2)} / R$ ${p.preco.toFixed(2)}</b></div>
       `;
       mobileBody.appendChild(card);
@@ -534,11 +624,11 @@
 
     pedidos.forEach((ped, idx) => {
       let total = ped.qtd * ped.precoUnitario;
-      let badgeCanal = ped.canal === "Shopee" ? "badge-orange" : ped.canal === "TikTok" ? "badge-purple" : "badge-green";
+      let badgeCanal = ped.canal === "TikTok" ? "badge-purple" : ped.canal === "Shopee" ? "badge-orange" : "badge-green";
 
       let tr = document.createElement("tr");
       tr.innerHTML = `
-        <td>#${ped.id}</td>
+        <td>#${ped.id} <br><small style="color:#94a3b8;">${ped.data || ''}</small></td>
         <td><b>${ped.produto}</b> (${ped.tamanho})</td>
         <td><span class="badge ${badgeCanal}">${ped.canal}</span></td>
         <td>${ped.qtd}</td>
@@ -591,10 +681,13 @@
     gastos.forEach((g, idx) => {
       let tr = document.createElement("tr");
       tr.innerHTML = `
-        <td>#${g.id}</td>
+        <td>#${g.id} <br><small style="color:#94a3b8;">${g.data || ''}</small></td>
         <td><b>${g.descricao}</b></td>
         <td style="color:#f87171; font-weight:bold;">R$ ${g.valor.toFixed(2)}</td>
-        <td><button class="btn-danger btn-xs" onclick="window.excluirGasto(${idx})">Excluir</button></td>
+        <td>
+          <button class="btn-warning btn-xs" onclick="window.editarGasto(${idx})">Editar</button>
+          <button class="btn-danger btn-xs" onclick="window.excluirGasto(${idx})">Excluir</button>
+        </td>
       `;
       tbody.appendChild(tr);
 
@@ -603,7 +696,10 @@
       card.innerHTML = `
         <div class="mobile-item-header">
           <div><b>${g.descricao}</b></div>
-          <button class="btn-danger btn-xs" onclick="window.excluirGasto(${idx})">Excluir</button>
+          <div>
+            <button class="btn-warning btn-xs" onclick="window.editarGasto(${idx})">Editar</button>
+            <button class="btn-danger btn-xs" onclick="window.excluirGasto(${idx})">Excluir</button>
+          </div>
         </div>
         <div class="mobile-row"><span>Valor do Gasto:</span> <b style="color:#f87171;">R$ ${g.valor.toFixed(2)}</b></div>
       `;
@@ -737,9 +833,11 @@
     p.vendas += qtd;
 
     let statusPgto = (canal === "Loja Física") ? "Recebido" : "A Receber";
+    let hojeISO = new Date().toISOString().split('T')[0];
 
     pedidos.unshift({
       id: Math.floor(1000 + Math.random() * 9000),
+      data: hojeISO,
       produto: p.nome,
       tamanho: p.tamanho,
       canal: canal,
@@ -754,7 +852,7 @@
     alert(`✅ Venda de ${qtd} un. (${canal}) registrada com sucesso!`);
   };
 
-  // Devolução com Validação e Estorno Financeiro
+  // Devolução com Validação
   window.registrarDevolucao = function() {
     if (produtos.length === 0) return;
 
@@ -765,13 +863,11 @@
 
     if (!p) return;
 
-    // Encontra vendas elegíveis para devolução do mesmo produto, tamanho e canal
     let vendasCandidatas = pedidos.filter(ped => ped.produto === p.nome && ped.tamanho === p.tamanho && ped.canal === canal && ped.qtd > 0);
-
     let totalQtdVendidaNoCanal = vendasCandidatas.reduce((sum, ped) => sum + ped.qtd, 0);
 
     if (totalQtdVendidaNoCanal < qtdDevolver) {
-      alert(`❌ Não é possível devolver ${qtdDevolver} peça(s). Constam apenas ${totalQtdVendidaNoCanal} unidade(s) vendidas no canal '${canal}' para este item.`);
+      alert(`❌ Erro na devolução! Constam apenas ${totalQtdVendidaNoCanal} unidade(s) vendidas no canal '${canal}' para este item.`);
       return;
     }
 
@@ -779,23 +875,21 @@
 
     for (let ped of vendasCandidatas) {
       if (qtdRestanteParaAbater <= 0) break;
-
       let abate = Math.min(ped.qtd, qtdRestanteParaAbater);
       ped.qtd -= abate;
       qtdRestanteParaAbater -= abate;
     }
 
-    // Limpa pedidos zerados
     pedidos = pedidos.filter(ped => ped.qtd > 0);
 
     p.estoque += qtdDevolver;
     p.devolucoes += qtdDevolver;
 
     salvarNuvem();
-    alert(`✅ Devolução de ${qtdDevolver} un. (${canal}) registrada com estorno financeiro automático!`);
+    alert(`✅ Devolução de ${qtdDevolver} un. (${canal}) registrada com sucesso!`);
   };
 
-  // Lançar Repasse Diário das Plataformas
+  // Lançar Repasse com Validação de Excesso
   window.lancarRepassePlataforma = function() {
     let plataforma = document.getElementById("repasse-plataforma").value;
     let valorRepasse = parseFloat(document.getElementById("repasse-valor").value);
@@ -808,8 +902,9 @@
     let pendentes = pedidos.filter(ped => ped.canal === plataforma && ped.statusPgto === "A Receber");
     let saldoPendentePlataforma = pendentes.reduce((sum, ped) => sum + (ped.qtd * ped.precoUnitario), 0);
 
-    if (saldoPendentePlataforma <= 0) {
-      alert(`Não existem valores pendentes a receber da plataforma '${plataforma}'.`);
+    // Conferencia de Segurança
+    if (valorRepasse > saldoPendentePlataforma) {
+      alert(`🛑 BLOQUEADO: O valor lançado (R$ ${valorRepasse.toFixed(2)}) é MAIOR que o saldo total a receber da plataforma '${plataforma}' (R$ ${saldoPendentePlataforma.toFixed(2)}).`);
       return;
     }
 
@@ -817,14 +912,12 @@
 
     for (let ped of pendentes) {
       if (valorRestante <= 0) break;
-
       let totalPed = ped.qtd * ped.precoUnitario;
 
       if (valorRestante >= totalPed) {
         ped.statusPgto = "Recebido";
         valorRestante -= totalPed;
       } else {
-        // Baixa parcial se necessário
         ped.statusPgto = "Recebido";
         valorRestante = 0;
       }
@@ -832,7 +925,7 @@
 
     salvarNuvem();
     document.getElementById("repasse-valor").value = "";
-    alert(`✅ Repasse de R$ ${valorRepasse.toFixed(2)} (${plataforma}) registrado! Saldo transferido para 'Valores Recebidos'.`);
+    alert(`✅ Repasse de R$ ${valorRepasse.toFixed(2)} (${plataforma}) recebido e transferido para o Caixa!`);
   };
 
   // Cadastrar Gastos Diversos
@@ -843,8 +936,11 @@
     if (!desc) { alert("Informe a descrição da despesa!"); return; }
     if (isNaN(val) || val <= 0) { alert("Informe um valor numérico válido!"); return; }
 
+    let hojeISO = new Date().toISOString().split('T')[0];
+
     gastos.unshift({
       id: Math.floor(100 + Math.random() * 900),
+      data: hojeISO,
       descricao: desc,
       valor: val
     });
@@ -852,7 +948,24 @@
     salvarNuvem();
     document.getElementById("gasto-descricao").value = "";
     document.getElementById("gasto-valor").value = "";
-    alert("✅ Despesa cadastrada e deduzida do Lucro Líquido!");
+    alert("✅ Despesa cadastrada!");
+  };
+
+  window.editarGasto = function(idx) {
+    let g = gastos[idx];
+    if (!g) return;
+
+    let novaDesc = prompt("Editar Descrição do Gasto:", g.descricao);
+    if (novaDesc === null) return;
+
+    let novoVal = prompt("Editar Valor do Gasto (R$):", g.valor);
+    if (novoVal === null) return;
+
+    g.descricao = novaDesc.trim();
+    g.valor = parseFloat(novoVal) || g.valor;
+
+    salvarNuvem();
+    alert("✅ Gasto atualizado!");
   };
 
   window.excluirGasto = function(idx) {
@@ -874,7 +987,7 @@
     let ped = pedidos[idx];
     if (!ped) return;
 
-    let novoCanal = prompt("Editar Canal de Venda (Shopee, TikTok, Loja Física, Outro):", ped.canal);
+    let novoCanal = prompt("Editar Canal (TikTok, Loja Física, Shopee, Outro):", ped.canal);
     if (novoCanal === null) return;
 
     let novoPreco = prompt("Editar Preço Unitário (R$):", ped.precoUnitario);
@@ -917,16 +1030,78 @@
     }
   };
 
+  // Gerador de Relatórios por Período
+  window.selecionarFiltroRelatorio = function() {
+    let tipo = document.getElementById("relatorio-periodo-tipo").value;
+    document.getElementById("box-datas-custom").style.display = (tipo === "custom") ? "flex" : "none";
+    gerarRelatorio();
+  };
+
+  window.gerarRelatorio = function() {
+    let tipo = document.getElementById("relatorio-periodo-tipo").value;
+    let hoje = new Date();
+    let dataInicio, dataFim;
+
+    if (tipo === "hoje") {
+      let hojeStr = hoje.toISOString().split('T')[0];
+      dataInicio = hojeStr;
+      dataFim = hojeStr;
+    } else if (tipo === "semana") {
+      let seteDiasAtras = new Date(hoje);
+      seteDiasAtras.setDate(hoje.getDate() - 7);
+      dataInicio = seteDiasAtras.toISOString().split('T')[0];
+      dataFim = hoje.toISOString().split('T')[0];
+    } else if (tipo === "mes") {
+      let primeiroDiaMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+      dataInicio = primeiroDiaMes.toISOString().split('T')[0];
+      dataFim = hoje.toISOString().split('T')[0];
+    } else {
+      dataInicio = document.getElementById("relatorio-data-inicio").value;
+      dataFim = document.getElementById("relatorio-data-fim").value;
+    }
+
+    let faturamento = 0;
+    let custoPecas = 0;
+    let qtdVendas = 0;
+
+    pedidos.forEach(ped => {
+      let dPed = ped.data || hoje.toISOString().split('T')[0];
+      if ((!dataInicio || dPed >= dataInicio) && (!dataFim || dPed <= dataFim)) {
+        faturamento += ped.qtd * ped.precoUnitario;
+        custoPecas += ped.qtd * ped.custoUnitario;
+        qtdVendas += ped.qtd;
+      }
+    });
+
+    let totalGastos = 0;
+    gastos.forEach(g => {
+      let dG = g.data || hoje.toISOString().split('T')[0];
+      if ((!dataInicio || dG >= dataInicio) && (!dataFim || dG <= dataFim)) {
+        totalGastos += g.valor;
+      }
+    });
+
+    let lucroPeriodo = faturamento - custoPecas - totalGastos;
+
+    document.getElementById("rel-faturamento").innerText = "R$ " + faturamento.toFixed(2);
+    document.getElementById("rel-vendas-qtd").innerText = qtdVendas + " peças vendidas";
+    document.getElementById("rel-custo-pecas").innerText = "R$ " + custoPecas.toFixed(2);
+    document.getElementById("rel-gastos").innerText = "R$ " + totalGastos.toFixed(2);
+    document.getElementById("rel-lucro").innerText = "R$ " + lucroPeriodo.toFixed(2);
+  };
+
   window.mudarAba = function(aba) {
     document.getElementById("aba-estoque").style.display = aba === 'estoque' ? 'block' : 'none';
     document.getElementById("aba-vendas").style.display = aba === 'vendas' ? 'block' : 'none';
     document.getElementById("aba-gastos").style.display = aba === 'gastos' ? 'block' : 'none';
     document.getElementById("aba-envio").style.display = aba === 'envio' ? 'block' : 'none';
+    document.getElementById("aba-relatorios").style.display = aba === 'relatorios' ? 'block' : 'none';
     
     document.getElementById("btn-tab-estoque").classList.toggle("active", aba === 'estoque');
     document.getElementById("btn-tab-vendas").classList.toggle("active", aba === 'vendas');
     document.getElementById("btn-tab-gastos").classList.toggle("active", aba === 'gastos');
     document.getElementById("btn-tab-envio").classList.toggle("active", aba === 'envio');
+    document.getElementById("btn-tab-relatorios").classList.toggle("active", aba === 'relatorios');
   };
 
   window.resetarTudo = function() {
