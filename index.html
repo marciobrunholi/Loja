@@ -33,7 +33,7 @@
       user-select: none;
     }
 
-    .container { max-width: 1280px; margin: 0 auto; position: relative; z-index: 1; }
+    .container { max-width: 1300px; margin: 0 auto; position: relative; z-index: 1; }
 
     header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #334155; }
     .brand { display: flex; align-items: center; gap: 12px; }
@@ -41,11 +41,11 @@
     h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; color: #f1f5f9; }
 
     /* Dashboard Cards */
-    .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 15px; margin-bottom: 25px; }
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
     .card { background: #1e293b; padding: 18px; border-radius: 12px; border: 1px solid #334155; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-    .card h3 { font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .card h3 { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
     .card .value { font-size: 22px; font-weight: 700; color: #f8fafc; }
-    .card .subtext { font-size: 12px; margin-top: 4px; }
+    .card .subtext { font-size: 12px; margin-top: 4px; font-weight: 600; }
     
     .text-blue { color: #38bdf8; }
     .text-green { color: #4ade80; }
@@ -81,8 +81,8 @@
     /* Tabela */
     .table-container { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
-    th { background: #0f172a; color: #94a3b8; padding: 12px; font-weight: 600; border-bottom: 1px solid #334155; }
-    td { padding: 12px; border-bottom: 1px solid #334155; }
+    th { background: #0f172a; color: #94a3b8; padding: 12px; font-weight: 600; border-bottom: 1px solid #334155; white-space: nowrap; }
+    td { padding: 12px; border-bottom: 1px solid #334155; white-space: nowrap; }
     tr:hover { background: rgba(255, 255, 255, 0.02); }
 
     .badge { padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
@@ -90,7 +90,6 @@
     .badge-yellow { background: rgba(234, 179, 8, 0.2); color: #fde047; }
     .badge-green { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
 
-    .actions-flex { display: flex; gap: 5px; }
     .btn-xs { padding: 4px 8px; font-size: 11px; border-radius: 4px; }
 
     .tabs { display: flex; gap: 10px; margin-bottom: 15px; }
@@ -130,9 +129,9 @@
       <div class="subtext text-orange" id="dash-vendas-qtd">0 peças vendidas</div>
     </div>
     <div class="card">
-      <h3>Lucro Líquido</h3>
+      <h3>Lucro Acumulado</h3>
       <div class="value text-green" id="dash-lucro">R$ 0,00</div>
-      <div class="subtext text-green" id="dash-roi">ROI: 0%</div>
+      <div class="subtext text-green" id="dash-roi">ROI Total: 0.0%</div>
     </div>
   </div>
 
@@ -143,12 +142,8 @@
       <div class="panel" style="margin-bottom: 20px;">
         <div class="panel-title">🛒 Movimentação Rápida</div>
         <div class="form-group">
-          <label>Selecione o Produto</label>
-          <select id="select-produto-op" onchange="atualizarComboTamanhos()"></select>
-        </div>
-        <div class="form-group">
-          <label>Tamanho</label>
-          <select id="select-tamanho-op"></select>
+          <label>Selecione a Peça / Tamanho</label>
+          <select id="select-produto-op"></select>
         </div>
         <div class="form-group">
           <label>Quantidade</label>
@@ -160,12 +155,23 @@
         </div>
       </div>
 
-      <!-- Cadastrar Produto / Ajustar Estoque -->
+      <!-- Cadastrar Peça com Tamanho Específico -->
       <div class="panel">
-        <div class="panel-title">📦 Cadastrar / Atualizar Peça</div>
+        <div class="panel-title">📦 Cadastrar / Adicionar Peça</div>
         <div class="form-group">
           <label>Nome da Peça / Modelo</label>
           <input type="text" id="prod-nome" placeholder="Ex: Camiseta Oversized">
+        </div>
+        <div class="form-group">
+          <label>Tamanho Específico</label>
+          <select id="prod-tamanho">
+            <option value="PP">PP</option>
+            <option value="P">P</option>
+            <option value="M">M</option>
+            <option value="G">G</option>
+            <option value="GG">GG</option>
+            <option value="Único">Único</option>
+          </select>
         </div>
         <div class="form-group">
           <label>Custo de Compra (R$)</label>
@@ -176,17 +182,17 @@
           <input type="number" id="prod-preco" step="0.01" value="60.00">
         </div>
         <div class="form-group">
-          <label>Adicionar Estoque Inicial</label>
-          <input type="number" id="prod-estoque-ini" value="0" min="0">
+          <label>Quantidade em Estoque</label>
+          <input type="number" id="prod-estoque-ini" value="1" min="1">
         </div>
-        <button class="btn-primary" onclick="cadastrarProduto()">Salvar Produto / Estoque</button>
+        <button class="btn-primary" onclick="cadastrarProduto()">Salvar Peça no Estoque</button>
       </div>
     </div>
 
     <!-- Tabela Principal com Abas -->
     <div class="panel">
       <div class="tabs">
-        <button class="tab-btn active" id="btn-tab-estoque" onclick="mudarAba('estoque')">Estoque por Tamanho</button>
+        <button class="tab-btn active" id="btn-tab-estoque" onclick="mudarAba('estoque')">Estoque Detalhado</button>
         <button class="tab-btn" id="btn-tab-envio" onclick="mudarAba('envio')">Status de Envio (<span id="count-a-enviar">0</span>)</button>
       </div>
 
@@ -199,10 +205,12 @@
               <th>Tam.</th>
               <th>Estoque</th>
               <th>Vendas</th>
-              <th>Devol.</th>
-              <th>Custo</th>
-              <th>Revenda</th>
-              <th>Lucro Liq.</th>
+              <th>Dev.</th>
+              <th>Custo Un.</th>
+              <th>Revenda Un.</th>
+              <th>Lucro Un. (R$ e %)</th>
+              <th>Lucro Total Acum.</th>
+              <th>Ação</th>
             </tr>
           </thead>
           <tbody id="tabela-estoque-corpo"></tbody>
@@ -229,15 +237,8 @@
 </div>
 
 <script>
-  // Dados Padrão Iniciais
-  let produtos = JSON.parse(localStorage.getItem("mk_store_produtos")) || [
-    { id: 1, nome: "Conjunto Moletom MK", tamanho: "P", estoque: 10, vendas: 0, devolucoes: 0, custo: 45.00, preco: 110.00 },
-    { id: 2, nome: "Conjunto Moletom MK", tamanho: "M", estoque: 15, vendas: 0, devolucoes: 0, custo: 45.00, preco: 110.00 },
-    { id: 3, nome: "Conjunto Moletom MK", tamanho: "G", estoque: 12, vendas: 0, devolucoes: 0, custo: 45.00, preco: 110.00 },
-    { id: 4, nome: "Camiseta Streetwear", tamanho: "M", estoque: 20, vendas: 0, devolucoes: 0, custo: 20.00, preco: 55.00 },
-    { id: 5, nome: "Camiseta Streetwear", tamanho: "G", estoque: 18, vendas: 0, devolucoes: 0, custo: 20.00, preco: 55.00 }
-  ];
-
+  // Inicialização com Estoque ZERADO
+  let produtos = JSON.parse(localStorage.getItem("mk_store_produtos")) || [];
   let pedidos = JSON.parse(localStorage.getItem("mk_store_pedidos")) || [];
 
   function salvar() {
@@ -277,10 +278,10 @@
     });
 
     let lucroLiquido = faturamento - custoVendido;
-    let roi = investTotal > 0 ? ((lucroLiquido / investTotal) * 100).toFixed(1) : 0;
+    let roi = investTotal > 0 ? ((lucroLiquido / investTotal) * 100).toFixed(1) : "0.0";
 
     document.getElementById("dash-investimento").innerText = "R$ " + investTotal.toFixed(2);
-    document.getElementById("dash-pecas-totais").innerText = pecasTotais + " peças no lote total";
+    document.getElementById("dash-pecas-totais").innerText = pecasTotais + " peças compradas";
 
     document.getElementById("dash-estoque-qtd").innerText = estoqueQtd + " peças";
     document.getElementById("dash-estoque-valor").innerText = "R$ " + estoqueValor.toFixed(2) + " em custo";
@@ -289,16 +290,23 @@
     document.getElementById("dash-vendas-qtd").innerText = vendasQtd + " vendas realizadas";
 
     document.getElementById("dash-lucro").innerText = "R$ " + lucroLiquido.toFixed(2);
-    document.getElementById("dash-roi").innerText = "ROI: " + roi + "% de retorno";
+    document.getElementById("dash-roi").innerText = "ROI Total: " + roi + "% de retorno";
   }
 
   function renderizarTabelaEstoque() {
     let tbody = document.getElementById("tabela-estoque-corpo");
     tbody.innerHTML = "";
 
-    produtos.forEach(p => {
+    if (produtos.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 20px;">Nenhum produto cadastrado no estoque. Adicione peças no formulário ao lado.</td></tr>`;
+      return;
+    }
+
+    produtos.forEach((p, idx) => {
       let vLiquidas = p.vendas - p.devolucoes;
-      let lucro = (vLiquidas * p.preco) - (vLiquidas * p.custo);
+      let lucroUnitarioR$ = p.preco - p.custo;
+      let lucroUnitarioMargem = p.custo > 0 ? ((lucroUnitarioR$ / p.custo) * 100).toFixed(1) : 0;
+      let lucroTotalAcumulado = vLiquidas * lucroUnitarioR$;
 
       let tr = document.createElement("tr");
       tr.innerHTML = `
@@ -309,7 +317,15 @@
         <td>${p.devolucoes}</td>
         <td>R$ ${p.custo.toFixed(2)}</td>
         <td>R$ ${p.preco.toFixed(2)}</td>
-        <td style="color:${lucro >= 0 ? '#4ade80':'#ef4444'}; font-weight:bold;">R$ ${lucro.toFixed(2)}</td>
+        <td style="color:#38bdf8; font-weight:bold;">
+          R$ ${lucroUnitarioR$.toFixed(2)} <span style="font-size:11px; color:#94a3b8;">(+${lucroUnitarioMargem}%)</span>
+        </td>
+        <td style="color:${lucroTotalAcumulado >= 0 ? '#4ade80':'#ef4444'}; font-weight:bold;">
+          R$ ${lucroTotalAcumulado.toFixed(2)}
+        </td>
+        <td>
+          <button class="btn-danger btn-xs" onclick="excluirProduto(${idx})">Excluir</button>
+        </td>
       `;
       tbody.appendChild(tr);
     });
@@ -334,7 +350,7 @@
           </span>
         </td>
         <td>
-          ${ped.status === 'A Enviar' ? `<button class="btn-primary btn-xs" onclick="marcarEnviado(${idx})">Marcar Enviado</button>` : '<span>OK</span>'}
+          ${ped.status === 'A Enviar' ? `<button class="btn-primary btn-xs" onclick="marcarEnviado(${idx})">Marcar Enviado</button>` : '<span style="color:#4ade80;">Concluído</span>'}
         </td>
       `;
       tbody.appendChild(tr);
@@ -345,83 +361,26 @@
 
   function atualizarSelects() {
     let selectProd = document.getElementById("select-produto-op");
-    let nomes = [...new Set(produtos.map(p => p.nome))];
-    
     selectProd.innerHTML = "";
-    nomes.forEach(nome => {
+
+    if (produtos.length === 0) {
       let opt = document.createElement("option");
-      opt.value = nome;
-      opt.innerText = nome;
+      opt.innerText = "Nenhum produto disponível";
       selectProd.appendChild(opt);
-    });
-
-    atualizarComboTamanhos();
-  }
-
-  function atualizarComboTamanhos() {
-    let nome = document.getElementById("select-produto-op").value;
-    let selectTam = document.getElementById("select-tamanho-op");
-    selectTam.innerHTML = "";
-
-    let prodsFiltrados = produtos.filter(p => p.nome === nome);
-    prodsFiltrados.forEach(p => {
-      let opt = document.createElement("option");
-      opt.value = p.tamanho;
-      opt.innerText = p.tamanho + " (Estoque: " + p.estoque + ")";
-      selectTam.appendChild(opt);
-    });
-  }
-
-  function registrarVenda() {
-    let nome = document.getElementById("select-produto-op").value;
-    let tam = document.getElementById("select-tamanho-op").value;
-    let qtd = parseInt(document.getElementById("qtd-op").value);
-
-    let p = produtos.find(item => item.nome === nome && item.tamanho === tam);
-    if (!p) return;
-
-    if (qtd > p.estoque) {
-      alert("❌ Estoque insuficiente!");
       return;
     }
 
-    p.estoque -= qtd;
-    p.vendas += qtd;
-
-    pedidos.unshift({
-      id: Math.floor(1000 + Math.random() * 9000),
-      produto: nome,
-      tamanho: tam,
-      qtd: qtd,
-      status: "A Enviar"
+    produtos.forEach((p, idx) => {
+      let opt = document.createElement("option");
+      opt.value = idx;
+      opt.innerText = `${p.nome} - Tam: ${p.tamanho} (Estoque: ${p.estoque})`;
+      selectProd.appendChild(opt);
     });
-
-    salvar();
-    alert("✅ Venda registrada! Pedido adicionado na aba 'Status de Envio'.");
-  }
-
-  function registrarDevolucao() {
-    let nome = document.getElementById("select-produto-op").value;
-    let tam = document.getElementById("select-tamanho-op").value;
-    let qtd = parseInt(document.getElementById("qtd-op").value);
-
-    let p = produtos.find(item => item.nome === nome && item.tamanho === tam);
-    if (!p) return;
-
-    p.estoque += qtd;
-    p.devolucoes += qtd;
-
-    salvar();
-    alert("✅ Devolução registrada no estoque!");
-  }
-
-  function marcarEnviado(idx) {
-    pedidos[idx].status = "Enviado";
-    salvar();
   }
 
   function cadastrarProduto() {
     let nome = document.getElementById("prod-nome").value.trim();
+    let tamanho = document.getElementById("prod-tamanho").value;
     let custo = parseFloat(document.getElementById("prod-custo").value);
     let preco = parseFloat(document.getElementById("prod-preco").value);
     let estoqueIni = parseInt(document.getElementById("prod-estoque-ini").value);
@@ -431,29 +390,91 @@
       return;
     }
 
-    let tamanhosPadrao = ["PP", "P", "M", "G", "GG"];
-    tamanhosPadrao.forEach(t => {
-      let existe = produtos.find(p => p.nome === nome && p.tamanho === t);
-      if (existe) {
-        existe.custo = custo;
-        existe.preco = preco;
-        if (estoqueIni > 0) existe.estoque += estoqueIni;
-      } else {
-        produtos.push({
-          id: Date.now() + Math.random(),
-          nome: nome,
-          tamanho: t,
-          estoque: estoqueIni,
-          vendas: 0,
-          devolucoes: 0,
-          custo: custo,
-          preco: preco
-        });
-      }
+    if (isNaN(custo) || isNaN(preco) || isNaN(estoqueIni) || estoqueIni < 0) {
+      alert("Preencha valores numéricos válidos!");
+      return;
+    }
+
+    // Busca se já existe este produto especificamente no MESMO tamanho
+    let existe = produtos.find(p => p.nome.toLowerCase() === nome.toLowerCase() && p.tamanho === tamanho);
+
+    if (existe) {
+      existe.custo = custo;
+      existe.preco = preco;
+      existe.estoque += estoqueIni;
+    } else {
+      produtos.push({
+        id: Date.now(),
+        nome: nome,
+        tamanho: tamanho,
+        estoque: estoqueIni,
+        vendas: 0,
+        devolucoes: 0,
+        custo: custo,
+        preco: preco
+      });
+    }
+
+    salvar();
+    document.getElementById("prod-nome").value = "";
+    alert(`✅ ${estoqueIni} peça(s) do produto '${nome}' (Tamanho ${tamanho}) salvas no estoque!`);
+  }
+
+  function registrarVenda() {
+    if (produtos.length === 0) return;
+
+    let idx = document.getElementById("select-produto-op").value;
+    let qtd = parseInt(document.getElementById("qtd-op").value);
+    let p = produtos[idx];
+
+    if (!p) return;
+
+    if (qtd > p.estoque) {
+      alert("❌ Estoque insuficiente para este tamanho!");
+      return;
+    }
+
+    p.estoque -= qtd;
+    p.vendas += qtd;
+
+    pedidos.unshift({
+      id: Math.floor(1000 + Math.random() * 9000),
+      produto: p.nome,
+      tamanho: p.tamanho,
+      qtd: qtd,
+      status: "A Enviar"
     });
 
     salvar();
-    alert("✅ Produto cadastrado/atualizado com sucesso!");
+    alert("✅ Venda registrada! Pedido adicionado em 'Status de Envio'.");
+  }
+
+  function registrarDevolucao() {
+    if (produtos.length === 0) return;
+
+    let idx = document.getElementById("select-produto-op").value;
+    let qtd = parseInt(document.getElementById("qtd-op").value);
+    let p = produtos[idx];
+
+    if (!p) return;
+
+    p.estoque += qtd;
+    p.devolucoes += qtd;
+
+    salvar();
+    alert("✅ Devolução registrada e produto retornado ao estoque!");
+  }
+
+  function marcarEnviado(idx) {
+    pedidos[idx].status = "Enviado";
+    salvar();
+  }
+
+  function excluirProduto(idx) {
+    if (confirm("Deseja remover esta peça do cadastro de estoque?")) {
+      produtos.splice(idx, 1);
+      salvar();
+    }
   }
 
   function mudarAba(aba) {
@@ -465,9 +486,11 @@
   }
 
   function resetarTudo() {
-    if (confirm("Tem certeza que deseja zerar todos os dados do sistema?")) {
+    if (confirm("Tem certeza que deseja zerar TODOS os dados e recomeçar do zero?")) {
       localStorage.clear();
-      location.reload();
+      produtos = [];
+      pedidos = [];
+      salvar();
     }
   }
 
