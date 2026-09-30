@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MK STORE - Gestão de Estoque e Vendas</title>
+  <title>MK STORE - Gestão de Estoque e Vendas Multicanal</title>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
     
@@ -33,22 +33,21 @@
       user-select: none;
     }
 
-    .container { width: 100%; max-width: 1300px; margin: 0 auto; position: relative; z-index: 1; }
+    .container { width: 100%; max-width: 1350px; margin: 0 auto; position: relative; z-index: 1; }
 
     header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #334155; }
     .brand { display: flex; align-items: center; gap: 10px; }
     .brand-logo { background: linear-gradient(135deg, #3b82f6, #8b5cf6); width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
     h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; color: #f1f5f9; }
 
-    /* Status Conexão */
     .status-online { font-size: 11px; background: rgba(34, 197, 94, 0.2); color: #4ade80; padding: 4px 8px; border-radius: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
 
-    /* Dashboard Cards */
-    .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 20px; }
+    /* Dashboard Cards - 5 Módulos Financeiros */
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; margin-bottom: 20px; }
 
     .card { background: #1e293b; padding: 14px; border-radius: 12px; border: 1px solid #334155; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
     .card h3 { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-    .card .value { font-size: 20px; font-weight: 700; color: #f8fafc; }
+    .card .value { font-size: 19px; font-weight: 700; color: #f8fafc; }
     .card .subtext { font-size: 11px; margin-top: 4px; font-weight: 600; }
     
     .text-blue { color: #38bdf8; }
@@ -56,9 +55,10 @@
     .text-purple { color: #c084fc; }
     .text-orange { color: #fb923c; }
     .text-yellow { color: #facc15; }
+    .text-cyan { color: #22d3ee; }
 
     /* Layout Principal */
-    .main-grid { display: grid; grid-template-columns: 320px 1fr; gap: 15px; }
+    .main-grid { display: grid; grid-template-columns: 340px 1fr; gap: 15px; }
     @media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
 
     .panel { background: #1e293b; border-radius: 12px; padding: 15px; border: 1px solid #334155; width: 100%; }
@@ -102,12 +102,14 @@
       .mobile-cards { display: flex; }
     }
 
-    .badge { padding: 3px 6px; border-radius: 20px; font-size: 10px; font-weight: 600; }
+    .badge { padding: 3px 6px; border-radius: 20px; font-size: 10px; font-weight: 600; display: inline-block; }
     .badge-blue { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
     .badge-yellow { background: rgba(234, 179, 8, 0.2); color: #fde047; }
     .badge-green { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+    .badge-purple { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
+    .badge-orange { background: rgba(249, 115, 22, 0.2); color: #fb923c; }
 
-    .btn-xs { padding: 5px 10px; font-size: 11px; border-radius: 6px; width: auto; }
+    .btn-xs { padding: 4px 8px; font-size: 11px; border-radius: 6px; width: auto; }
 
     .tabs { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
     .tab-btn { padding: 8px 12px; background: #0f172a; border: 1px solid #334155; color: #94a3b8; border-radius: 6px; cursor: pointer; width: auto; font-size: 12px; }
@@ -122,7 +124,7 @@
       <div class="brand-logo">MK</div>
       <div>
         <h1>MK STORE <span class="status-online">☁️ Nuvem Ativa</span></h1>
-        <p style="font-size: 11px; color: #94a3b8;">Gestão de Estoque Sincronizada</p>
+        <p style="font-size: 11px; color: #94a3b8;">Gestão Multicanal de Vendas e Caixa</p>
       </div>
     </div>
     <button class="btn-secondary btn-xs" onclick="resetarTudo()">⚠️ Zerar Tudo</button>
@@ -141,14 +143,19 @@
       <div class="subtext text-yellow" id="dash-estoque-valor">R$ 0,00 em custo</div>
     </div>
     <div class="card">
-      <h3>Faturamento Total</h3>
-      <div class="value text-orange" id="dash-faturamento">R$ 0,00</div>
-      <div class="subtext text-orange" id="dash-vendas-qtd">0 vendas realizadas</div>
+      <h3>A Receber (Plataformas)</h3>
+      <div class="value text-orange" id="dash-a-receber">R$ 0,00</div>
+      <div class="subtext text-orange" id="dash-a-receber-qtd">0 vendas pendentes</div>
     </div>
     <div class="card">
-      <h3>Lucro Acumulado</h3>
-      <div class="value text-green" id="dash-lucro">R$ 0,00</div>
-      <div class="subtext text-green" id="dash-roi">ROI: 0.0%</div>
+      <h3>Recebido (Em Caixa)</h3>
+      <div class="value text-green" id="dash-recebido">R$ 0,00</div>
+      <div class="subtext text-green" id="dash-recebido-sub">Caixa Confirmado</div>
+    </div>
+    <div class="card">
+      <h3>Lucro Líquido Real</h3>
+      <div class="value text-purple" id="dash-lucro">R$ 0,00</div>
+      <div class="subtext text-purple" id="dash-roi">ROI: 0.0%</div>
     </div>
   </div>
 
@@ -157,17 +164,30 @@
     <div>
       <!-- Registrar Venda / Devolução -->
       <div class="panel" style="margin-bottom: 15px;">
-        <div class="panel-title">🛒 Movimentação Rápida</div>
+        <div class="panel-title">🛒 Registrar Venda / Canal</div>
         <div class="form-group">
           <label>Selecione a Peça / Tamanho</label>
-          <select id="select-produto-op"></select>
+          <select id="select-produto-op" onchange="atualizarPrecoVendaSugerido()"></select>
+        </div>
+        <div class="form-group">
+          <label>Canal de Venda</label>
+          <select id="canal-venda">
+            <option value="Shopee">Shopee (A Receber)</option>
+            <option value="TikTok">TikTok Shop (A Receber)</option>
+            <option value="Loja Física">Loja Física (Recebido no Ato)</option>
+            <option value="Outro">Outro Canal</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Preço Praticado nesta Venda (Unitário R$)</label>
+          <input type="number" id="preco-venda-efetivo" step="0.01" value="0.00">
         </div>
         <div class="form-group">
           <label>Quantidade</label>
           <input type="number" id="qtd-op" value="1" min="1">
         </div>
         <div class="btn-group">
-          <button class="btn-success" onclick="registrarVenda()">Vender</button>
+          <button class="btn-success" onclick="registrarVenda()">Registrar Venda</button>
           <button class="btn-warning" onclick="registrarDevolucao()">Devolver</button>
         </div>
       </div>
@@ -195,14 +215,14 @@
           <input type="number" id="prod-custo" step="0.01" value="25.00">
         </div>
         <div class="form-group">
-          <label>Preço de Revenda (R$)</label>
+          <label>Preço Padrão de Revenda (R$)</label>
           <input type="number" id="prod-preco" step="0.01" value="60.00">
         </div>
         <div class="form-group">
           <label>Quantidade em Estoque</label>
           <input type="number" id="prod-estoque-ini" value="1" min="1">
         </div>
-        <button class="btn-primary" onclick="cadastrarProduto()">Salvar na Nuvem</button>
+        <button class="btn-primary" onclick="cadastrarProduto()">Salvar Peça no Estoque</button>
       </div>
     </div>
 
@@ -210,6 +230,7 @@
     <div class="panel">
       <div class="tabs">
         <button class="tab-btn active" id="btn-tab-estoque" onclick="mudarAba('estoque')">Estoque Detalhado</button>
+        <button class="tab-btn" id="btn-tab-vendas" onclick="mudarAba('vendas')">Vendas & Financeiro (<span id="count-a-receber">0</span>)</button>
         <button class="tab-btn" id="btn-tab-envio" onclick="mudarAba('envio')">Status de Envio (<span id="count-a-enviar">0</span>)</button>
       </div>
 
@@ -225,9 +246,7 @@
                 <th>Vendas</th>
                 <th>Dev.</th>
                 <th>Custo Un.</th>
-                <th>Revenda Un.</th>
-                <th>Lucro Un. (R$ e %)</th>
-                <th>Lucro Total Acum.</th>
+                <th>Preço Padrão</th>
                 <th>Ação</th>
               </tr>
             </thead>
@@ -237,7 +256,28 @@
         <div class="mobile-cards" id="mobile-estoque-corpo"></div>
       </div>
 
-      <!-- Aba 2: Gestão de Envios -->
+      <!-- Aba 2: Gestão de Vendas / Financeiro -->
+      <div id="aba-vendas" style="display: none;">
+        <div class="table-container table-desktop">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Produto / Tam</th>
+                <th>Canal</th>
+                <th>Qtd.</th>
+                <th>Valor Total</th>
+                <th>Status Pgto.</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-vendas-corpo"></tbody>
+          </table>
+        </div>
+        <div class="mobile-cards" id="mobile-vendas-corpo"></div>
+      </div>
+
+      <!-- Aba 3: Gestão de Envios -->
       <div id="aba-envio" style="display: none;">
         <div class="table-container table-desktop">
           <table>
@@ -245,8 +285,9 @@
               <tr>
                 <th>ID Pedido</th>
                 <th>Produto / Tamanho</th>
+                <th>Canal</th>
                 <th>Qtd.</th>
-                <th>Status</th>
+                <th>Status Logístico</th>
                 <th>Ação</th>
               </tr>
             </thead>
@@ -264,7 +305,6 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  // Suas chaves oficiais do Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyA069-7OwRLC2lm3zqUuECyHFquHeAWjlM",
     authDomain: "mk-store-fea25.firebaseapp.com",
@@ -280,7 +320,6 @@
   let produtos = [];
   let pedidos = [];
 
-  // Escuta alterações na nuvem em Tempo Real (Sincronização entre Celulares)
   onSnapshot(doc(db, "mk_store", "dados"), (docSnap) => {
     if (docSnap.exists()) {
       const data = docSnap.data();
@@ -301,13 +340,14 @@
       });
     } catch (e) {
       console.error("Erro ao salvar no Firebase: ", e);
-      alert("Erro ao conectar à nuvem. Verifique a internet e as regras do Firestore.");
+      alert("Erro ao conectar à nuvem.");
     }
   }
 
   function atualizarTelas() {
     renderizarDashboard();
     renderizarTabelaEstoque();
+    renderizarTabelaVendas();
     renderizarTabelaEnvios();
     atualizarSelects();
   }
@@ -317,9 +357,13 @@
     let pecasTotais = 0;
     let estoqueQtd = 0;
     let estoqueValor = 0;
-    let faturamento = 0;
-    let vendasQtd = 0;
-    let custoVendido = 0;
+
+    let valorAReceber = 0;
+    let qtdAReceber = 0;
+
+    let valorRecebido = 0;
+    let custoVendidoTotal = 0;
+    let faturamentoTotalGeral = 0;
 
     produtos.forEach(p => {
       let pecasProduto = p.estoque + p.vendas - p.devolucoes;
@@ -328,14 +372,24 @@
 
       estoqueQtd += p.estoque;
       estoqueValor += p.estoque * p.custo;
-
-      let vendasLiquidas = p.vendas - p.devolucoes;
-      faturamento += vendasLiquidas * p.preco;
-      custoVendido += vendasLiquidas * p.custo;
-      vendasQtd += vendasLiquidas;
     });
 
-    let lucroLiquido = faturamento - custoVendido;
+    pedidos.forEach(ped => {
+      let totalPedido = ped.qtd * ped.precoUnitario;
+      let custoPedido = ped.qtd * ped.custoUnitario;
+
+      faturamentoTotalGeral += totalPedido;
+      custoVendidoTotal += custoPedido;
+
+      if (ped.statusPgto === "A Receber") {
+        valorAReceber += totalPedido;
+        qtdAReceber++;
+      } else {
+        valorRecebido += totalPedido;
+      }
+    });
+
+    let lucroLiquido = faturamentoTotalGeral - custoVendidoTotal;
     let roi = investTotal > 0 ? ((lucroLiquido / investTotal) * 100).toFixed(1) : "0.0";
 
     document.getElementById("dash-investimento").innerText = "R$ " + investTotal.toFixed(2);
@@ -344,11 +398,15 @@
     document.getElementById("dash-estoque-qtd").innerText = estoqueQtd + " peças";
     document.getElementById("dash-estoque-valor").innerText = "R$ " + estoqueValor.toFixed(2) + " em custo";
 
-    document.getElementById("dash-faturamento").innerText = "R$ " + faturamento.toFixed(2);
-    document.getElementById("dash-vendas-qtd").innerText = vendasQtd + " vendas realizadas";
+    document.getElementById("dash-a-receber").innerText = "R$ " + valorAReceber.toFixed(2);
+    document.getElementById("dash-a-receber-qtd").innerText = qtdAReceber + " repasses pendentes";
+
+    document.getElementById("dash-recebido").innerText = "R$ " + valorRecebido.toFixed(2);
 
     document.getElementById("dash-lucro").innerText = "R$ " + lucroLiquido.toFixed(2);
     document.getElementById("dash-roi").innerText = "ROI: " + roi + "%";
+
+    document.getElementById("count-a-receber").innerText = qtdAReceber;
   }
 
   function renderizarTabelaEstoque() {
@@ -358,18 +416,12 @@
     mobileBody.innerHTML = "";
 
     if (produtos.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 20px;">Nenhum produto cadastrado na nuvem.</td></tr>`;
-      mobileBody.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 20px;">Nenhum produto cadastrado na nuvem.</div>`;
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #94a3b8; padding: 20px;">Nenhum produto cadastrado na nuvem.</td></tr>`;
+      mobileBody.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 20px;">Nenhum produto cadastrado.</div>`;
       return;
     }
 
     produtos.forEach((p, idx) => {
-      let vLiquidas = p.vendas - p.devolucoes;
-      let lucroUnitarioR$ = p.preco - p.custo;
-      let lucroUnitarioMargem = p.custo > 0 ? ((lucroUnitarioR$ / p.custo) * 100).toFixed(1) : 0;
-      let lucroTotalAcumulado = vLiquidas * lucroUnitarioR$;
-
-      // Desktop
       let tr = document.createElement("tr");
       tr.innerHTML = `
         <td><b>${p.nome}</b></td>
@@ -379,19 +431,12 @@
         <td>${p.devolucoes}</td>
         <td>R$ ${p.custo.toFixed(2)}</td>
         <td>R$ ${p.preco.toFixed(2)}</td>
-        <td style="color:#38bdf8; font-weight:bold;">
-          R$ ${lucroUnitarioR$.toFixed(2)} <span style="font-size:10px; color:#94a3b8;">(+${lucroUnitarioMargem}%)</span>
-        </td>
-        <td style="color:${lucroTotalAcumulado >= 0 ? '#4ade80':'#ef4444'}; font-weight:bold;">
-          R$ ${lucroTotalAcumulado.toFixed(2)}
-        </td>
         <td>
           <button class="btn-danger btn-xs" onclick="window.excluirQuantidade(${idx})">Excluir</button>
         </td>
       `;
       tbody.appendChild(tr);
 
-      // Celular
       let card = document.createElement("div");
       card.className = "mobile-item";
       card.innerHTML = `
@@ -401,9 +446,65 @@
         </div>
         <div class="mobile-row"><span>Estoque Atual:</span> <b>${p.estoque} peças</b></div>
         <div class="mobile-row"><span>Vendas / Devoluções:</span> <b>${p.vendas} / ${p.devolucoes}</b></div>
-        <div class="mobile-row"><span>Custo / Revenda:</span> <b>R$ ${p.custo.toFixed(2)} / R$ ${p.preco.toFixed(2)}</b></div>
-        <div class="mobile-row"><span>Lucro Unitário:</span> <b style="color:#38bdf8;">R$ ${lucroUnitarioR$.toFixed(2)} (+${lucroUnitarioMargem}%)</b></div>
-        <div class="mobile-row"><span>Lucro Total Acum.:</span> <b style="color:${lucroTotalAcumulado >= 0 ? '#4ade80':'#ef4444'};">R$ ${lucroTotalAcumulado.toFixed(2)}</b></div>
+        <div class="mobile-row"><span>Custo / Preço Padrão:</span> <b>R$ ${p.custo.toFixed(2)} / R$ ${p.preco.toFixed(2)}</b></div>
+      `;
+      mobileBody.appendChild(card);
+    });
+  }
+
+  function renderizarTabelaVendas() {
+    let tbody = document.getElementById("tabela-vendas-corpo");
+    let mobileBody = document.getElementById("mobile-vendas-corpo");
+    tbody.innerHTML = "";
+    mobileBody.innerHTML = "";
+
+    if (pedidos.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #94a3b8; padding: 20px;">Nenhuma venda registrada.</td></tr>`;
+      mobileBody.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 20px;">Nenhuma venda registrada.</div>`;
+      return;
+    }
+
+    pedidos.forEach((ped, idx) => {
+      let total = ped.qtd * ped.precoUnitario;
+      let badgeCanal = ped.canal === "Shopee" ? "badge-orange" : ped.canal === "TikTok" ? "badge-purple" : "badge-green";
+
+      // Desktop
+      let tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>#${ped.id}</td>
+        <td><b>${ped.produto}</b> (${ped.tamanho})</td>
+        <td><span class="badge ${badgeCanal}">${ped.canal}</span></td>
+        <td>${ped.qtd}</td>
+        <td><b>R$ ${total.toFixed(2)}</b> <br><small style="color:#94a3b8;">(R$ ${ped.precoUnitario.toFixed(2)}/un)</small></td>
+        <td>
+          <span class="badge ${ped.statusPgto === 'A Receber' ? 'badge-yellow' : 'badge-green'}">
+            ${ped.statusPgto}
+          </span>
+        </td>
+        <td>
+          <div style="display:flex; gap:4px;">
+            ${ped.statusPgto === 'A Receber' ? `<button class="btn-success btn-xs" onclick="window.darBaixaPagamento(${idx})">Baixar R$</button>` : ''}
+            <button class="btn-warning btn-xs" onclick="window.editarVenda(${idx})">Editar</button>
+          </div>
+        </td>
+      `;
+      tbody.appendChild(tr);
+
+      // Celular
+      let card = document.createElement("div");
+      card.className = "mobile-item";
+      card.innerHTML = `
+        <div class="mobile-item-header">
+          <div><b>#${ped.id}</b> - ${ped.produto} (${ped.tamanho})</div>
+          <span class="badge ${badgeCanal}">${ped.canal}</span>
+        </div>
+        <div class="mobile-row"><span>Quantidade:</span> <b>${ped.qtd} un.</b></div>
+        <div class="mobile-row"><span>Valor Total Venda:</span> <b>R$ ${total.toFixed(2)}</b> (R$ ${ped.precoUnitario.toFixed(2)}/un)</div>
+        <div class="mobile-row"><span>Status Pagamento:</span> <span class="badge ${ped.statusPgto === 'A Receber' ? 'badge-yellow' : 'badge-green'}">${ped.statusPgto}</span></div>
+        <div style="display:flex; gap:6px; margin-top: 10px;">
+          ${ped.statusPgto === 'A Receber' ? `<button class="btn-success btn-xs" style="width:100%;" onclick="window.darBaixaPagamento(${idx})">Dar Baixa (Recebido)</button>` : ''}
+          <button class="btn-warning btn-xs" style="width:100%;" onclick="window.editarVenda(${idx})">Editar Venda</button>
+        </div>
       `;
       mobileBody.appendChild(card);
     });
@@ -417,36 +518,35 @@
     let aEnviarCount = 0;
 
     pedidos.forEach((ped, idx) => {
-      if (ped.status === "A Enviar") aEnviarCount++;
+      if (ped.statusEnvio === "A Enviar") aEnviarCount++;
 
-      // Desktop
       let tr = document.createElement("tr");
       tr.innerHTML = `
         <td>#${ped.id}</td>
         <td><b>${ped.produto}</b> (${ped.tamanho})</td>
+        <td><span class="badge badge-blue">${ped.canal}</span></td>
         <td>${ped.qtd}</td>
         <td>
-          <span class="badge ${ped.status === 'A Enviar' ? 'badge-yellow' : 'badge-green'}">
-            ${ped.status}
+          <span class="badge ${ped.statusEnvio === 'A Enviar' ? 'badge-yellow' : 'badge-green'}">
+            ${ped.statusEnvio}
           </span>
         </td>
         <td>
-          ${ped.status === 'A Enviar' ? `<button class="btn-primary btn-xs" onclick="window.marcarEnviado(${idx})">Enviado</button>` : '<span style="color:#4ade80;">OK</span>'}
+          ${ped.statusEnvio === 'A Enviar' ? `<button class="btn-primary btn-xs" onclick="window.marcarEnviado(${idx})">Enviado</button>` : '<span style="color:#4ade80;">OK</span>'}
         </td>
       `;
       tbody.appendChild(tr);
 
-      // Celular
       let card = document.createElement("div");
       card.className = "mobile-item";
       card.innerHTML = `
         <div class="mobile-item-header">
           <div><b>#${ped.id}</b> - ${ped.produto} (${ped.tamanho})</div>
-          <span class="badge ${ped.status === 'A Enviar' ? 'badge-yellow' : 'badge-green'}">${ped.status}</span>
+          <span class="badge ${ped.statusEnvio === 'A Enviar' ? 'badge-yellow' : 'badge-green'}">${ped.statusEnvio}</span>
         </div>
-        <div class="mobile-row"><span>Quantidade:</span> <b>${ped.qtd} peça(s)</b></div>
+        <div class="mobile-row"><span>Canal / Qtd:</span> <b>${ped.canal} / ${ped.qtd} peça(s)</b></div>
         <div style="margin-top: 8px;">
-          ${ped.status === 'A Enviar' ? `<button class="btn-primary btn-xs" style="width:100%;" onclick="window.marcarEnviado(${idx})">Marcar como Enviado</button>` : '<span style="color:#4ade80; font-size:12px;">Pedido Concluído</span>'}
+          ${ped.statusEnvio === 'A Enviar' ? `<button class="btn-primary btn-xs" style="width:100%;" onclick="window.marcarEnviado(${idx})">Marcar como Enviado</button>` : '<span style="color:#4ade80; font-size:12px;">Pedido Concluído</span>'}
         </div>
       `;
       mobileBody.appendChild(card);
@@ -472,9 +572,18 @@
       opt.innerText = `${p.nome} - Tam: ${p.tamanho} (Estoque: ${p.estoque})`;
       selectProd.appendChild(opt);
     });
+
+    atualizarPrecoVendaSugerido();
   }
 
-  // Funções Globais expostas para os botões do HTML
+  window.atualizarPrecoVendaSugerido = function() {
+    let idx = document.getElementById("select-produto-op").value;
+    if (produtos[idx]) {
+      document.getElementById("preco-venda-efetivo").value = produtos[idx].preco.toFixed(2);
+    }
+  };
+
+  // Cadastrar Produto
   window.cadastrarProduto = function() {
     let nome = document.getElementById("prod-nome").value.trim();
     let tamanho = document.getElementById("prod-tamanho").value;
@@ -513,17 +622,25 @@
 
     salvarNuvem();
     document.getElementById("prod-nome").value = "";
-    alert(`✅ ${estoqueIni} peça(s) salva(s) na nuvem!`);
+    alert(`✅ ${estoqueIni} peça(s) salva(s) no estoque!`);
   };
 
+  // Registrar Venda com Canal e Valor Específico
   window.registrarVenda = function() {
     if (produtos.length === 0) return;
 
     let idx = document.getElementById("select-produto-op").value;
+    let canal = document.getElementById("canal-venda").value;
+    let precoUnitario = parseFloat(document.getElementById("preco-venda-efetivo").value);
     let qtd = parseInt(document.getElementById("qtd-op").value);
     let p = produtos[idx];
 
     if (!p) return;
+
+    if (isNaN(precoUnitario) || precoUnitario < 0) {
+      alert("Informe um preço de venda válido!");
+      return;
+    }
 
     if (qtd > p.estoque) {
       alert("❌ Estoque insuficiente!");
@@ -533,16 +650,23 @@
     p.estoque -= qtd;
     p.vendas += qtd;
 
+    // Vendas em loja física o dinheiro entra na hora, plataformas ficam 'A Receber'
+    let statusPgto = (canal === "Loja Física") ? "Recebido" : "A Receber";
+
     pedidos.unshift({
       id: Math.floor(1000 + Math.random() * 9000),
       produto: p.nome,
       tamanho: p.tamanho,
+      canal: canal,
       qtd: qtd,
-      status: "A Enviar"
+      precoUnitario: precoUnitario,
+      custoUnitario: p.custo,
+      statusPgto: statusPgto,
+      statusEnvio: canal === "Loja Física" ? "Entregue" : "A Enviar"
     });
 
     salvarNuvem();
-    alert("✅ Venda registrada na nuvem!");
+    alert(`✅ Venda de ${qtd} un. (${canal}) registrada com sucesso!`);
   };
 
   window.registrarDevolucao = function() {
@@ -558,11 +682,42 @@
     p.devolucoes += qtd;
 
     salvarNuvem();
-    alert("✅ Devolução registrada na nuvem!");
+    alert("✅ Devolução registrada no estoque!");
+  };
+
+  // Baixa no Pagamento de Plataformas (A Receber -> Recebido)
+  window.darBaixaPagamento = function(idx) {
+    let ped = pedidos[idx];
+    if (confirm(`Confirmar o recebimento de R$ ${(ped.qtd * ped.precoUnitario).toFixed(2)} referente ao pedido #${ped.id} (${ped.canal})?`)) {
+      ped.statusPgto = "Recebido";
+      salvarNuvem();
+    }
+  };
+
+  // Editar Venda
+  window.editarVenda = function(idx) {
+    let ped = pedidos[idx];
+    if (!ped) return;
+
+    let novoCanal = prompt("Editar Canal de Venda (Shopee, TikTok, Loja Física, Outro):", ped.canal);
+    if (novoCanal === null) return;
+
+    let novoPreco = prompt("Editar Preço Unitário de Venda (R$):", ped.precoUnitario);
+    if (novoPreco === null) return;
+
+    let novoStatusPgto = prompt("Editar Status de Pagamento (A Receber / Recebido):", ped.statusPgto);
+    if (novoStatusPgto === null) return;
+
+    ped.canal = novoCanal.trim();
+    ped.precoUnitario = parseFloat(novoPreco) || ped.precoUnitario;
+    ped.statusPgto = novoStatusPgto.trim();
+
+    salvarNuvem();
+    alert("✅ Venda atualizada com sucesso!");
   };
 
   window.marcarEnviado = function(idx) {
-    pedidos[idx].status = "Enviado";
+    pedidos[idx].statusEnvio = "Enviado";
     salvarNuvem();
   };
 
@@ -571,11 +726,9 @@
     if (!p) return;
 
     let resposta = prompt(`Peça: ${p.nome} (${p.tamanho})\nEstoque Atual: ${p.estoque} unidade(s).\n\nQuantas unidades deseja remover?`, "1");
-
     if (resposta === null) return;
 
     let qtdRemover = parseInt(resposta);
-
     if (isNaN(qtdRemover) || qtdRemover <= 0) {
       alert("Por favor, digite um número válido.");
       return;
@@ -594,9 +747,11 @@
 
   window.mudarAba = function(aba) {
     document.getElementById("aba-estoque").style.display = aba === 'estoque' ? 'block' : 'none';
+    document.getElementById("aba-vendas").style.display = aba === 'vendas' ? 'block' : 'none';
     document.getElementById("aba-envio").style.display = aba === 'envio' ? 'block' : 'none';
     
     document.getElementById("btn-tab-estoque").classList.toggle("active", aba === 'estoque');
+    document.getElementById("btn-tab-vendas").classList.toggle("active", aba === 'vendas');
     document.getElementById("btn-tab-envio").classList.toggle("active", aba === 'envio');
   };
 
