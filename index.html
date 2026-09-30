@@ -40,6 +40,9 @@
     .brand-logo { background: linear-gradient(135deg, #3b82f6, #8b5cf6); width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
     h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; color: #f1f5f9; }
 
+    /* Status Conexão */
+    .status-online { font-size: 11px; background: rgba(34, 197, 94, 0.2); color: #4ade80; padding: 4px 8px; border-radius: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+
     /* Dashboard Cards */
     .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 20px; }
 
@@ -80,18 +83,14 @@
     .btn-secondary:hover { background: #334155; }
 
     /* Tabela Desktop / Rolagem */
-    .table-container {
-      width: 100%;
-      overflow-x: auto;
-      border-radius: 8px;
-    }
+    .table-container { width: 100%; overflow-x: auto; border-radius: 8px; }
 
     table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; }
     th { background: #0f172a; color: #94a3b8; padding: 10px; font-weight: 600; border-bottom: 1px solid #334155; white-space: nowrap; }
     td { padding: 10px; border-bottom: 1px solid #334155; white-space: nowrap; }
     tr:hover { background: rgba(255, 255, 255, 0.02); }
 
-    /* Modos de Exibição no Celular (Lista de Cards) */
+    /* Modos de Exibição no Celular */
     .mobile-cards { display: none; flex-direction: column; gap: 10px; }
     .mobile-item { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 12px; }
     .mobile-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-bottom: 1px solid #1e293b; padding-bottom: 6px; }
@@ -122,11 +121,11 @@
     <div class="brand">
       <div class="brand-logo">MK</div>
       <div>
-        <h1>MK STORE</h1>
-        <p style="font-size: 11px; color: #94a3b8;">Gestão de Estoque e Vendas</p>
+        <h1>MK STORE <span class="status-online">☁️ Nuvem Ativa</span></h1>
+        <p style="font-size: 11px; color: #94a3b8;">Gestão de Estoque Sincronizada</p>
       </div>
     </div>
-    <button class="btn-secondary btn-xs" onclick="resetarTudo()">⚠️ Zerar</button>
+    <button class="btn-secondary btn-xs" onclick="resetarTudo()">⚠️ Zerar Tudo</button>
   </header>
 
   <!-- Painel de Métricas Financeiras -->
@@ -173,7 +172,7 @@
         </div>
       </div>
 
-      <!-- Cadastrar Peça com Tamanho Específico -->
+      <!-- Cadastrar Peça -->
       <div class="panel">
         <div class="panel-title">📦 Cadastrar / Adicionar Peça</div>
         <div class="form-group">
@@ -203,11 +202,11 @@
           <label>Quantidade em Estoque</label>
           <input type="number" id="prod-estoque-ini" value="1" min="1">
         </div>
-        <button class="btn-primary" onclick="cadastrarProduto()">Salvar Peça no Estoque</button>
+        <button class="btn-primary" onclick="cadastrarProduto()">Salvar na Nuvem</button>
       </div>
     </div>
 
-    <!-- Tabela Principal e Visão Celular -->
+    <!-- Tabela Principal -->
     <div class="panel">
       <div class="tabs">
         <button class="tab-btn active" id="btn-tab-estoque" onclick="mudarAba('estoque')">Estoque Detalhado</button>
@@ -216,7 +215,6 @@
 
       <!-- Aba 1: Estoque Geral -->
       <div id="aba-estoque">
-        <!-- Tabela Computador -->
         <div class="table-container table-desktop">
           <table>
             <thead>
@@ -236,8 +234,6 @@
             <tbody id="tabela-estoque-corpo"></tbody>
           </table>
         </div>
-
-        <!-- Lista de Cards para Celular -->
         <div class="mobile-cards" id="mobile-estoque-corpo"></div>
       </div>
 
@@ -257,21 +253,56 @@
             <tbody id="tabela-envios-corpo"></tbody>
           </table>
         </div>
-
         <div class="mobile-cards" id="mobile-envios-corpo"></div>
       </div>
     </div>
   </div>
 </div>
 
-<script>
-  let produtos = JSON.parse(localStorage.getItem("mk_store_produtos")) || [];
-  let pedidos = JSON.parse(localStorage.getItem("mk_store_pedidos")) || [];
+<!-- Firebase SDKs -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  function salvar() {
-    localStorage.setItem("mk_store_produtos", JSON.stringify(produtos));
-    localStorage.setItem("mk_store_pedidos", JSON.stringify(pedidos));
+  // Suas chaves oficiais do Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyA069-7OwRLC2lm3zqUuECyHFquHeAWjlM",
+    authDomain: "mk-store-fea25.firebaseapp.com",
+    projectId: "mk-store-fea25",
+    storageBucket: "mk-store-fea25.firebasestorage.app",
+    messagingSenderId: "879329190003",
+    appId: "1:879329190003:web:5c4a0abdd6dfda73714a06"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  let produtos = [];
+  let pedidos = [];
+
+  // Escuta alterações na nuvem em Tempo Real (Sincronização entre Celulares)
+  onSnapshot(doc(db, "mk_store", "dados"), (docSnap) => {
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      produtos = data.produtos || [];
+      pedidos = data.pedidos || [];
+    } else {
+      produtos = [];
+      pedidos = [];
+    }
     atualizarTelas();
+  });
+
+  async function salvarNuvem() {
+    try {
+      await setDoc(doc(db, "mk_store", "dados"), {
+        produtos: produtos,
+        pedidos: pedidos
+      });
+    } catch (e) {
+      console.error("Erro ao salvar no Firebase: ", e);
+      alert("Erro ao conectar à nuvem. Verifique a internet e as regras do Firestore.");
+    }
   }
 
   function atualizarTelas() {
@@ -327,8 +358,8 @@
     mobileBody.innerHTML = "";
 
     if (produtos.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 20px;">Nenhum produto cadastrado.</td></tr>`;
-      mobileBody.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 20px;">Nenhum produto cadastrado.</div>`;
+      tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: #94a3b8; padding: 20px;">Nenhum produto cadastrado na nuvem.</td></tr>`;
+      mobileBody.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 20px;">Nenhum produto cadastrado na nuvem.</div>`;
       return;
     }
 
@@ -338,7 +369,7 @@
       let lucroUnitarioMargem = p.custo > 0 ? ((lucroUnitarioR$ / p.custo) * 100).toFixed(1) : 0;
       let lucroTotalAcumulado = vLiquidas * lucroUnitarioR$;
 
-      // Linha da Tabela Desktop
+      // Desktop
       let tr = document.createElement("tr");
       tr.innerHTML = `
         <td><b>${p.nome}</b></td>
@@ -355,18 +386,18 @@
           R$ ${lucroTotalAcumulado.toFixed(2)}
         </td>
         <td>
-          <button class="btn-danger btn-xs" onclick="excluirQuantidade(${idx})">Excluir</button>
+          <button class="btn-danger btn-xs" onclick="window.excluirQuantidade(${idx})">Excluir</button>
         </td>
       `;
       tbody.appendChild(tr);
 
-      // Card do Celular
+      // Celular
       let card = document.createElement("div");
       card.className = "mobile-item";
       card.innerHTML = `
         <div class="mobile-item-header">
           <div><b>${p.nome}</b> <span class="badge badge-blue">${p.tamanho}</span></div>
-          <button class="btn-danger btn-xs" onclick="excluirQuantidade(${idx})">Excluir</button>
+          <button class="btn-danger btn-xs" onclick="window.excluirQuantidade(${idx})">Excluir</button>
         </div>
         <div class="mobile-row"><span>Estoque Atual:</span> <b>${p.estoque} peças</b></div>
         <div class="mobile-row"><span>Vendas / Devoluções:</span> <b>${p.vendas} / ${p.devolucoes}</b></div>
@@ -400,7 +431,7 @@
           </span>
         </td>
         <td>
-          ${ped.status === 'A Enviar' ? `<button class="btn-primary btn-xs" onclick="marcarEnviado(${idx})">Enviado</button>` : '<span style="color:#4ade80;">OK</span>'}
+          ${ped.status === 'A Enviar' ? `<button class="btn-primary btn-xs" onclick="window.marcarEnviado(${idx})">Enviado</button>` : '<span style="color:#4ade80;">OK</span>'}
         </td>
       `;
       tbody.appendChild(tr);
@@ -415,7 +446,7 @@
         </div>
         <div class="mobile-row"><span>Quantidade:</span> <b>${ped.qtd} peça(s)</b></div>
         <div style="margin-top: 8px;">
-          ${ped.status === 'A Enviar' ? `<button class="btn-primary btn-xs" style="width:100%;" onclick="marcarEnviado(${idx})">Marcar como Enviado</button>` : '<span style="color:#4ade80; font-size:12px;">Pedido Concluído</span>'}
+          ${ped.status === 'A Enviar' ? `<button class="btn-primary btn-xs" style="width:100%;" onclick="window.marcarEnviado(${idx})">Marcar como Enviado</button>` : '<span style="color:#4ade80; font-size:12px;">Pedido Concluído</span>'}
         </div>
       `;
       mobileBody.appendChild(card);
@@ -443,7 +474,8 @@
     });
   }
 
-  function cadastrarProduto() {
+  // Funções Globais expostas para os botões do HTML
+  window.cadastrarProduto = function() {
     let nome = document.getElementById("prod-nome").value.trim();
     let tamanho = document.getElementById("prod-tamanho").value;
     let custo = parseFloat(document.getElementById("prod-custo").value);
@@ -479,12 +511,12 @@
       });
     }
 
-    salvar();
+    salvarNuvem();
     document.getElementById("prod-nome").value = "";
-    alert(`✅ ${estoqueIni} peça(s) salva(s) no estoque!`);
-  }
+    alert(`✅ ${estoqueIni} peça(s) salva(s) na nuvem!`);
+  };
 
-  function registrarVenda() {
+  window.registrarVenda = function() {
     if (produtos.length === 0) return;
 
     let idx = document.getElementById("select-produto-op").value;
@@ -509,11 +541,11 @@
       status: "A Enviar"
     });
 
-    salvar();
-    alert("✅ Venda registrada!");
-  }
+    salvarNuvem();
+    alert("✅ Venda registrada na nuvem!");
+  };
 
-  function registrarDevolucao() {
+  window.registrarDevolucao = function() {
     if (produtos.length === 0) return;
 
     let idx = document.getElementById("select-produto-op").value;
@@ -525,62 +557,56 @@
     p.estoque += qtd;
     p.devolucoes += qtd;
 
-    salvar();
-    alert("✅ Devolução registrada!");
-  }
+    salvarNuvem();
+    alert("✅ Devolução registrada na nuvem!");
+  };
 
-  function marcarEnviado(idx) {
+  window.marcarEnviado = function(idx) {
     pedidos[idx].status = "Enviado";
-    salvar();
-  }
+    salvarNuvem();
+  };
 
-  // EXCLUSÃO POR QUANTIDADE
-  function excluirQuantidade(idx) {
+  window.excluirQuantidade = function(idx) {
     let p = produtos[idx];
     if (!p) return;
 
-    let resposta = prompt(`Peça: ${p.nome} (${p.tamanho})\nEstoque Atual: ${p.estoque} unidade(s).\n\nQuantas unidades deseja remover do estoque?`, "1");
+    let resposta = prompt(`Peça: ${p.nome} (${p.tamanho})\nEstoque Atual: ${p.estoque} unidade(s).\n\nQuantas unidades deseja remover?`, "1");
 
-    if (resposta === null) return; // Cancelou
+    if (resposta === null) return;
 
     let qtdRemover = parseInt(resposta);
 
     if (isNaN(qtdRemover) || qtdRemover <= 0) {
-      alert("Por favor, digite um número válido maior que 0.");
+      alert("Por favor, digite um número válido.");
       return;
     }
 
     if (qtdRemover < p.estoque) {
       p.estoque -= qtdRemover;
-      salvar();
-      alert(`✅ Foram removidas ${qtdRemover} unidade(s). Restam ${p.estoque} no estoque.`);
+      salvarNuvem();
     } else {
-      if (confirm(`A quantidade digitada (${qtdRemover}) é igual ou maior que o estoque atual (${p.estoque}). Deseja remover este item completamente do cadastro?`)) {
+      if (confirm(`Remover este item completamente do cadastro?`)) {
         produtos.splice(idx, 1);
-        salvar();
-        alert("✅ Item removido do cadastro!");
+        salvarNuvem();
       }
     }
-  }
+  };
 
-  function mudarAba(aba) {
+  window.mudarAba = function(aba) {
     document.getElementById("aba-estoque").style.display = aba === 'estoque' ? 'block' : 'none';
     document.getElementById("aba-envio").style.display = aba === 'envio' ? 'block' : 'none';
     
     document.getElementById("btn-tab-estoque").classList.toggle("active", aba === 'estoque');
     document.getElementById("btn-tab-envio").classList.toggle("active", aba === 'envio');
-  }
+  };
 
-  function resetarTudo() {
-    if (confirm("Deseja zerar TODOS os dados?")) {
-      localStorage.clear();
+  window.resetarTudo = function() {
+    if (confirm("Deseja zerar TODOS os dados salvos na nuvem?")) {
       produtos = [];
       pedidos = [];
-      salvar();
+      salvarNuvem();
     }
-  }
-
-  atualizarTelas();
+  };
 </script>
 
 </body>
