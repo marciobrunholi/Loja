@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MK STORE - Gestão de Estoque e Vendas Multicanal</title>
+  <title>MK STORE - Gestão Multicanal e Fluxo de Caixa</title>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
     
@@ -15,7 +15,7 @@
       min-height: 100vh;
     }
 
-    /* Marca d'água de fundo MK STORE */
+    /* Marca d'água MK STORE */
     body::before {
       content: "MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE MK STORE";
       position: fixed;
@@ -33,7 +33,7 @@
       user-select: none;
     }
 
-    .container { width: 100%; max-width: 1350px; margin: 0 auto; position: relative; z-index: 1; }
+    .container { width: 100%; max-width: 1400px; margin: 0 auto; position: relative; z-index: 1; }
 
     header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #334155; }
     .brand { display: flex; align-items: center; gap: 10px; }
@@ -42,12 +42,12 @@
 
     .status-online { font-size: 11px; background: rgba(34, 197, 94, 0.2); color: #4ade80; padding: 4px 8px; border-radius: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
 
-    /* Dashboard Cards - 5 Módulos Financeiros */
-    .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; margin-bottom: 20px; }
+    /* Dashboard Cards - Módulos Financeiros Avançados */
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 20px; }
 
     .card { background: #1e293b; padding: 14px; border-radius: 12px; border: 1px solid #334155; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
     .card h3 { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-    .card .value { font-size: 19px; font-weight: 700; color: #f8fafc; }
+    .card .value { font-size: 18px; font-weight: 700; color: #f8fafc; }
     .card .subtext { font-size: 11px; margin-top: 4px; font-weight: 600; }
     
     .text-blue { color: #38bdf8; }
@@ -55,22 +55,22 @@
     .text-purple { color: #c084fc; }
     .text-orange { color: #fb923c; }
     .text-yellow { color: #facc15; }
-    .text-cyan { color: #22d3ee; }
+    .text-red { color: #f87171; }
 
     /* Layout Principal */
-    .main-grid { display: grid; grid-template-columns: 340px 1fr; gap: 15px; }
-    @media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
+    .main-grid { display: grid; grid-template-columns: 350px 1fr; gap: 15px; }
+    @media (max-width: 950px) { .main-grid { grid-template-columns: 1fr; } }
 
-    .panel { background: #1e293b; border-radius: 12px; padding: 15px; border: 1px solid #334155; width: 100%; }
-    .panel-title { font-size: 15px; font-weight: 700; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #334155; display: flex; align-items: center; gap: 8px; }
+    .panel { background: #1e293b; border-radius: 12px; padding: 15px; border: 1px solid #334155; width: 100%; margin-bottom: 15px; }
+    .panel-title { font-size: 14px; font-weight: 700; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #334155; display: flex; align-items: center; gap: 8px; }
 
     .form-group { margin-bottom: 12px; }
     label { display: block; margin-bottom: 4px; font-size: 12px; color: #94a3b8; }
-    input, select { width: 100%; padding: 10px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #f8fafc; font-size: 14px; outline: none; }
+    input, select { width: 100%; padding: 10px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #f8fafc; font-size: 13px; outline: none; }
     input:focus, select:focus { border-color: #3b82f6; }
 
     .btn-group { display: flex; gap: 8px; margin-top: 12px; }
-    button { width: 100%; padding: 11px; border: none; border-radius: 8px; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    button { width: 100%; padding: 10px; border: none; border-radius: 8px; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
     .btn-primary { background: #3b82f6; color: white; }
     .btn-primary:hover { background: #2563eb; }
     .btn-success { background: #22c55e; color: white; }
@@ -124,7 +124,7 @@
       <div class="brand-logo">MK</div>
       <div>
         <h1>MK STORE <span class="status-online">☁️ Nuvem Ativa</span></h1>
-        <p style="font-size: 11px; color: #94a3b8;">Gestão Multicanal de Vendas e Caixa</p>
+        <p style="font-size: 11px; color: #94a3b8;">Gestão Multicanal e Fluxo de Caixa Real</p>
       </div>
     </div>
     <button class="btn-secondary btn-xs" onclick="resetarTudo()">⚠️ Zerar Tudo</button>
@@ -133,7 +133,7 @@
   <!-- Painel de Métricas Financeiras -->
   <div class="cards-grid">
     <div class="card">
-      <h3>Investimento Total</h3>
+      <h3>Investimento Produtos</h3>
       <div class="value text-blue" id="dash-investimento">R$ 0,00</div>
       <div class="subtext text-blue" id="dash-pecas-totais">0 peças compradas</div>
     </div>
@@ -145,12 +145,17 @@
     <div class="card">
       <h3>A Receber (Plataformas)</h3>
       <div class="value text-orange" id="dash-a-receber">R$ 0,00</div>
-      <div class="subtext text-orange" id="dash-a-receber-qtd">0 vendas pendentes</div>
+      <div class="subtext text-orange" id="dash-a-receber-detalhe">Shopee: R$ 0 | TikTok: R$ 0</div>
     </div>
     <div class="card">
-      <h3>Recebido (Em Caixa)</h3>
+      <h3>Valores Recebidos (Caixa)</h3>
       <div class="value text-green" id="dash-recebido">R$ 0,00</div>
-      <div class="subtext text-green" id="dash-recebido-sub">Caixa Confirmado</div>
+      <div class="subtext text-green">Entradas confirmadas</div>
+    </div>
+    <div class="card">
+      <h3>Gastos Diversos</h3>
+      <div class="value text-red" id="dash-gastos-total">R$ 0,00</div>
+      <div class="subtext text-red" id="dash-gastos-qtd">0 despesas lançadas</div>
     </div>
     <div class="card">
       <h3>Lucro Líquido Real</h3>
@@ -160,11 +165,11 @@
   </div>
 
   <div class="main-grid">
-    <!-- Formulários laterais -->
+    <!-- Formulários Laterais -->
     <div>
       <!-- Registrar Venda / Devolução -->
-      <div class="panel" style="margin-bottom: 15px;">
-        <div class="panel-title">🛒 Registrar Venda / Canal</div>
+      <div class="panel">
+        <div class="panel-title">🛒 Movimentação de Vendas</div>
         <div class="form-group">
           <label>Selecione a Peça / Tamanho</label>
           <select id="select-produto-op" onchange="atualizarPrecoVendaSugerido()"></select>
@@ -174,12 +179,12 @@
           <select id="canal-venda">
             <option value="Shopee">Shopee (A Receber)</option>
             <option value="TikTok">TikTok Shop (A Receber)</option>
-            <option value="Loja Física">Loja Física (Recebido no Ato)</option>
+            <option value="Loja Física">Loja Física (Recebido em Caixa)</option>
             <option value="Outro">Outro Canal</option>
           </select>
         </div>
         <div class="form-group">
-          <label>Preço Praticado nesta Venda (Unitário R$)</label>
+          <label>Preço Praticado (Unitário R$)</label>
           <input type="number" id="preco-venda-efetivo" step="0.01" value="0.00">
         </div>
         <div class="form-group">
@@ -188,8 +193,40 @@
         </div>
         <div class="btn-group">
           <button class="btn-success" onclick="registrarVenda()">Registrar Venda</button>
-          <button class="btn-warning" onclick="registrarDevolucao()">Devolver</button>
+          <button class="btn-warning" onclick="registrarDevolucao()">Devolver Item</button>
         </div>
+      </div>
+
+      <!-- Lançar Repasse Diário de Plataforma -->
+      <div class="panel">
+        <div class="panel-title">💵 Lançar Repasse Recebido</div>
+        <div class="form-group">
+          <label>Plataforma Pagadora</label>
+          <select id="repasse-plataforma">
+            <option value="Shopee">Shopee</option>
+            <option value="TikTok">TikTok Shop</option>
+            <option value="Outro">Outro Canal Online</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Valor Depositado / Recebido (R$)</label>
+          <input type="number" id="repasse-valor" step="0.01" placeholder="Ex: 150.00">
+        </div>
+        <button class="btn-primary" onclick="lancarRepassePlataforma()">Confirmar Repasse no Caixa</button>
+      </div>
+
+      <!-- Cadastrar Gastos Diversos -->
+      <div class="panel">
+        <div class="panel-title">💸 Gastos Diversos da Loja</div>
+        <div class="form-group">
+          <label>Descrição da Despesa</label>
+          <input type="text" id="gasto-descricao" placeholder="Ex: Sacolas, Frete, Embalagens">
+        </div>
+        <div class="form-group">
+          <label>Valor do Gasto (R$)</label>
+          <input type="number" id="gasto-valor" step="0.01" placeholder="Ex: 45.00">
+        </div>
+        <button class="btn-danger" onclick="cadastrarGasto()">Lançar Despesa</button>
       </div>
 
       <!-- Cadastrar Peça -->
@@ -226,11 +263,12 @@
       </div>
     </div>
 
-    <!-- Tabela Principal -->
+    <!-- Tabela Principal com Abas -->
     <div class="panel">
       <div class="tabs">
         <button class="tab-btn active" id="btn-tab-estoque" onclick="mudarAba('estoque')">Estoque Detalhado</button>
-        <button class="tab-btn" id="btn-tab-vendas" onclick="mudarAba('vendas')">Vendas & Financeiro (<span id="count-a-receber">0</span>)</button>
+        <button class="tab-btn" id="btn-tab-vendas" onclick="mudarAba('vendas')">Vendas & Financeiro</button>
+        <button class="tab-btn" id="btn-tab-gastos" onclick="mudarAba('gastos')">Gastos Diversos</button>
         <button class="tab-btn" id="btn-tab-envio" onclick="mudarAba('envio')">Status de Envio (<span id="count-a-enviar">0</span>)</button>
       </div>
 
@@ -277,7 +315,25 @@
         <div class="mobile-cards" id="mobile-vendas-corpo"></div>
       </div>
 
-      <!-- Aba 3: Gestão de Envios -->
+      <!-- Aba 3: Gastos Diversos -->
+      <div id="aba-gastos" style="display: none;">
+        <div class="table-container table-desktop">
+          <table>
+            <thead>
+              <tr>
+                <th>Data/ID</th>
+                <th>Descrição do Gasto</th>
+                <th>Valor (R$)</th>
+                <th>Ação</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-gastos-corpo"></tbody>
+          </table>
+        </div>
+        <div class="mobile-cards" id="mobile-gastos-corpo"></div>
+      </div>
+
+      <!-- Aba 4: Gestão de Envios -->
       <div id="aba-envio" style="display: none;">
         <div class="table-container table-desktop">
           <table>
@@ -319,15 +375,18 @@
 
   let produtos = [];
   let pedidos = [];
+  let gastos = [];
 
   onSnapshot(doc(db, "mk_store", "dados"), (docSnap) => {
     if (docSnap.exists()) {
       const data = docSnap.data();
       produtos = data.produtos || [];
       pedidos = data.pedidos || [];
+      gastos = data.gastos || [];
     } else {
       produtos = [];
       pedidos = [];
+      gastos = [];
     }
     atualizarTelas();
   });
@@ -336,7 +395,8 @@
     try {
       await setDoc(doc(db, "mk_store", "dados"), {
         produtos: produtos,
-        pedidos: pedidos
+        pedidos: pedidos,
+        gastos: gastos
       });
     } catch (e) {
       console.error("Erro ao salvar no Firebase: ", e);
@@ -348,6 +408,7 @@
     renderizarDashboard();
     renderizarTabelaEstoque();
     renderizarTabelaVendas();
+    renderizarTabelaGastos();
     renderizarTabelaEnvios();
     atualizarSelects();
   }
@@ -358,8 +419,9 @@
     let estoqueQtd = 0;
     let estoqueValor = 0;
 
-    let valorAReceber = 0;
-    let qtdAReceber = 0;
+    let aReceberShopee = 0;
+    let aReceberTikTok = 0;
+    let aReceberOutros = 0;
 
     let valorRecebido = 0;
     let custoVendidoTotal = 0;
@@ -382,14 +444,19 @@
       custoVendidoTotal += custoPedido;
 
       if (ped.statusPgto === "A Receber") {
-        valorAReceber += totalPedido;
-        qtdAReceber++;
+        if (ped.canal === "Shopee") aReceberShopee += totalPedido;
+        else if (ped.canal === "TikTok") aReceberTikTok += totalPedido;
+        else aReceberOutros += totalPedido;
       } else {
         valorRecebido += totalPedido;
       }
     });
 
-    let lucroLiquido = faturamentoTotalGeral - custoVendidoTotal;
+    let totalGastos = gastos.reduce((sum, g) => sum + g.valor, 0);
+    let totalAReceber = aReceberShopee + aReceberTikTok + aReceberOutros;
+
+    // Lucro Líquido Real = Faturamento Total - Custo dos Produtos Vendidos - Gastos Operacionais
+    let lucroLiquido = faturamentoTotalGeral - custoVendidoTotal - totalGastos;
     let roi = investTotal > 0 ? ((lucroLiquido / investTotal) * 100).toFixed(1) : "0.0";
 
     document.getElementById("dash-investimento").innerText = "R$ " + investTotal.toFixed(2);
@@ -398,15 +465,16 @@
     document.getElementById("dash-estoque-qtd").innerText = estoqueQtd + " peças";
     document.getElementById("dash-estoque-valor").innerText = "R$ " + estoqueValor.toFixed(2) + " em custo";
 
-    document.getElementById("dash-a-receber").innerText = "R$ " + valorAReceber.toFixed(2);
-    document.getElementById("dash-a-receber-qtd").innerText = qtdAReceber + " repasses pendentes";
+    document.getElementById("dash-a-receber").innerText = "R$ " + totalAReceber.toFixed(2);
+    document.getElementById("dash-a-receber-detalhe").innerText = `Shopee: R$ ${aReceberShopee.toFixed(2)} | TikTok: R$ ${aReceberTikTok.toFixed(2)}`;
 
     document.getElementById("dash-recebido").innerText = "R$ " + valorRecebido.toFixed(2);
 
+    document.getElementById("dash-gastos-total").innerText = "R$ " + totalGastos.toFixed(2);
+    document.getElementById("dash-gastos-qtd").innerText = gastos.length + " despesas lançadas";
+
     document.getElementById("dash-lucro").innerText = "R$ " + lucroLiquido.toFixed(2);
     document.getElementById("dash-roi").innerText = "ROI: " + roi + "%";
-
-    document.getElementById("count-a-receber").innerText = qtdAReceber;
   }
 
   function renderizarTabelaEstoque() {
@@ -468,7 +536,6 @@
       let total = ped.qtd * ped.precoUnitario;
       let badgeCanal = ped.canal === "Shopee" ? "badge-orange" : ped.canal === "TikTok" ? "badge-purple" : "badge-green";
 
-      // Desktop
       let tr = document.createElement("tr");
       tr.innerHTML = `
         <td>#${ped.id}</td>
@@ -490,7 +557,6 @@
       `;
       tbody.appendChild(tr);
 
-      // Celular
       let card = document.createElement("div");
       card.className = "mobile-item";
       card.innerHTML = `
@@ -505,6 +571,41 @@
           ${ped.statusPgto === 'A Receber' ? `<button class="btn-success btn-xs" style="width:100%;" onclick="window.darBaixaPagamento(${idx})">Dar Baixa (Recebido)</button>` : ''}
           <button class="btn-warning btn-xs" style="width:100%;" onclick="window.editarVenda(${idx})">Editar Venda</button>
         </div>
+      `;
+      mobileBody.appendChild(card);
+    });
+  }
+
+  function renderizarTabelaGastos() {
+    let tbody = document.getElementById("tabela-gastos-corpo");
+    let mobileBody = document.getElementById("mobile-gastos-corpo");
+    tbody.innerHTML = "";
+    mobileBody.innerHTML = "";
+
+    if (gastos.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #94a3b8; padding: 20px;">Nenhum gasto registrado.</td></tr>`;
+      mobileBody.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 20px;">Nenhum gasto registrado.</div>`;
+      return;
+    }
+
+    gastos.forEach((g, idx) => {
+      let tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>#${g.id}</td>
+        <td><b>${g.descricao}</b></td>
+        <td style="color:#f87171; font-weight:bold;">R$ ${g.valor.toFixed(2)}</td>
+        <td><button class="btn-danger btn-xs" onclick="window.excluirGasto(${idx})">Excluir</button></td>
+      `;
+      tbody.appendChild(tr);
+
+      let card = document.createElement("div");
+      card.className = "mobile-item";
+      card.innerHTML = `
+        <div class="mobile-item-header">
+          <div><b>${g.descricao}</b></div>
+          <button class="btn-danger btn-xs" onclick="window.excluirGasto(${idx})">Excluir</button>
+        </div>
+        <div class="mobile-row"><span>Valor do Gasto:</span> <b style="color:#f87171;">R$ ${g.valor.toFixed(2)}</b></div>
       `;
       mobileBody.appendChild(card);
     });
@@ -591,15 +692,8 @@
     let preco = parseFloat(document.getElementById("prod-preco").value);
     let estoqueIni = parseInt(document.getElementById("prod-estoque-ini").value);
 
-    if (!nome) {
-      alert("Informe o nome do produto!");
-      return;
-    }
-
-    if (isNaN(custo) || isNaN(preco) || isNaN(estoqueIni) || estoqueIni < 0) {
-      alert("Preencha valores numéricos válidos!");
-      return;
-    }
+    if (!nome) { alert("Informe o nome do produto!"); return; }
+    if (isNaN(custo) || isNaN(preco) || isNaN(estoqueIni) || estoqueIni < 0) { alert("Preencha valores válidos!"); return; }
 
     let existe = produtos.find(p => p.nome.toLowerCase() === nome.toLowerCase() && p.tamanho === tamanho);
 
@@ -625,7 +719,7 @@
     alert(`✅ ${estoqueIni} peça(s) salva(s) no estoque!`);
   };
 
-  // Registrar Venda com Canal e Valor Específico
+  // Registrar Venda
   window.registrarVenda = function() {
     if (produtos.length === 0) return;
 
@@ -636,21 +730,12 @@
     let p = produtos[idx];
 
     if (!p) return;
-
-    if (isNaN(precoUnitario) || precoUnitario < 0) {
-      alert("Informe um preço de venda válido!");
-      return;
-    }
-
-    if (qtd > p.estoque) {
-      alert("❌ Estoque insuficiente!");
-      return;
-    }
+    if (isNaN(precoUnitario) || precoUnitario < 0) { alert("Informe um preço de venda válido!"); return; }
+    if (qtd > p.estoque) { alert("❌ Estoque insuficiente!"); return; }
 
     p.estoque -= qtd;
     p.vendas += qtd;
 
-    // Vendas em loja física o dinheiro entra na hora, plataformas ficam 'A Receber'
     let statusPgto = (canal === "Loja Física") ? "Recebido" : "A Receber";
 
     pedidos.unshift({
@@ -669,23 +754,114 @@
     alert(`✅ Venda de ${qtd} un. (${canal}) registrada com sucesso!`);
   };
 
+  // Devolução com Validação e Estorno Financeiro
   window.registrarDevolucao = function() {
     if (produtos.length === 0) return;
 
     let idx = document.getElementById("select-produto-op").value;
-    let qtd = parseInt(document.getElementById("qtd-op").value);
+    let canal = document.getElementById("canal-venda").value;
+    let qtdDevolver = parseInt(document.getElementById("qtd-op").value);
     let p = produtos[idx];
 
     if (!p) return;
 
-    p.estoque += qtd;
-    p.devolucoes += qtd;
+    // Encontra vendas elegíveis para devolução do mesmo produto, tamanho e canal
+    let vendasCandidatas = pedidos.filter(ped => ped.produto === p.nome && ped.tamanho === p.tamanho && ped.canal === canal && ped.qtd > 0);
+
+    let totalQtdVendidaNoCanal = vendasCandidatas.reduce((sum, ped) => sum + ped.qtd, 0);
+
+    if (totalQtdVendidaNoCanal < qtdDevolver) {
+      alert(`❌ Não é possível devolver ${qtdDevolver} peça(s). Constam apenas ${totalQtdVendidaNoCanal} unidade(s) vendidas no canal '${canal}' para este item.`);
+      return;
+    }
+
+    let qtdRestanteParaAbater = qtdDevolver;
+
+    for (let ped of vendasCandidatas) {
+      if (qtdRestanteParaAbater <= 0) break;
+
+      let abate = Math.min(ped.qtd, qtdRestanteParaAbater);
+      ped.qtd -= abate;
+      qtdRestanteParaAbater -= abate;
+    }
+
+    // Limpa pedidos zerados
+    pedidos = pedidos.filter(ped => ped.qtd > 0);
+
+    p.estoque += qtdDevolver;
+    p.devolucoes += qtdDevolver;
 
     salvarNuvem();
-    alert("✅ Devolução registrada no estoque!");
+    alert(`✅ Devolução de ${qtdDevolver} un. (${canal}) registrada com estorno financeiro automático!`);
   };
 
-  // Baixa no Pagamento de Plataformas (A Receber -> Recebido)
+  // Lançar Repasse Diário das Plataformas
+  window.lancarRepassePlataforma = function() {
+    let plataforma = document.getElementById("repasse-plataforma").value;
+    let valorRepasse = parseFloat(document.getElementById("repasse-valor").value);
+
+    if (isNaN(valorRepasse) || valorRepasse <= 0) {
+      alert("Informe um valor numérico válido para o repasse!");
+      return;
+    }
+
+    let pendentes = pedidos.filter(ped => ped.canal === plataforma && ped.statusPgto === "A Receber");
+    let saldoPendentePlataforma = pendentes.reduce((sum, ped) => sum + (ped.qtd * ped.precoUnitario), 0);
+
+    if (saldoPendentePlataforma <= 0) {
+      alert(`Não existem valores pendentes a receber da plataforma '${plataforma}'.`);
+      return;
+    }
+
+    let valorRestante = valorRepasse;
+
+    for (let ped of pendentes) {
+      if (valorRestante <= 0) break;
+
+      let totalPed = ped.qtd * ped.precoUnitario;
+
+      if (valorRestante >= totalPed) {
+        ped.statusPgto = "Recebido";
+        valorRestante -= totalPed;
+      } else {
+        // Baixa parcial se necessário
+        ped.statusPgto = "Recebido";
+        valorRestante = 0;
+      }
+    }
+
+    salvarNuvem();
+    document.getElementById("repasse-valor").value = "";
+    alert(`✅ Repasse de R$ ${valorRepasse.toFixed(2)} (${plataforma}) registrado! Saldo transferido para 'Valores Recebidos'.`);
+  };
+
+  // Cadastrar Gastos Diversos
+  window.cadastrarGasto = function() {
+    let desc = document.getElementById("gasto-descricao").value.trim();
+    let val = parseFloat(document.getElementById("gasto-valor").value);
+
+    if (!desc) { alert("Informe a descrição da despesa!"); return; }
+    if (isNaN(val) || val <= 0) { alert("Informe um valor numérico válido!"); return; }
+
+    gastos.unshift({
+      id: Math.floor(100 + Math.random() * 900),
+      descricao: desc,
+      valor: val
+    });
+
+    salvarNuvem();
+    document.getElementById("gasto-descricao").value = "";
+    document.getElementById("gasto-valor").value = "";
+    alert("✅ Despesa cadastrada e deduzida do Lucro Líquido!");
+  };
+
+  window.excluirGasto = function(idx) {
+    if (confirm("Remover este gasto do histórico?")) {
+      gastos.splice(idx, 1);
+      salvarNuvem();
+    }
+  };
+
   window.darBaixaPagamento = function(idx) {
     let ped = pedidos[idx];
     if (confirm(`Confirmar o recebimento de R$ ${(ped.qtd * ped.precoUnitario).toFixed(2)} referente ao pedido #${ped.id} (${ped.canal})?`)) {
@@ -694,7 +870,6 @@
     }
   };
 
-  // Editar Venda
   window.editarVenda = function(idx) {
     let ped = pedidos[idx];
     if (!ped) return;
@@ -702,7 +877,7 @@
     let novoCanal = prompt("Editar Canal de Venda (Shopee, TikTok, Loja Física, Outro):", ped.canal);
     if (novoCanal === null) return;
 
-    let novoPreco = prompt("Editar Preço Unitário de Venda (R$):", ped.precoUnitario);
+    let novoPreco = prompt("Editar Preço Unitário (R$):", ped.precoUnitario);
     if (novoPreco === null) return;
 
     let novoStatusPgto = prompt("Editar Status de Pagamento (A Receber / Recebido):", ped.statusPgto);
@@ -713,7 +888,7 @@
     ped.statusPgto = novoStatusPgto.trim();
 
     salvarNuvem();
-    alert("✅ Venda atualizada com sucesso!");
+    alert("✅ Venda atualizada!");
   };
 
   window.marcarEnviado = function(idx) {
@@ -729,10 +904,7 @@
     if (resposta === null) return;
 
     let qtdRemover = parseInt(resposta);
-    if (isNaN(qtdRemover) || qtdRemover <= 0) {
-      alert("Por favor, digite um número válido.");
-      return;
-    }
+    if (isNaN(qtdRemover) || qtdRemover <= 0) { alert("Digite um número válido."); return; }
 
     if (qtdRemover < p.estoque) {
       p.estoque -= qtdRemover;
@@ -748,10 +920,12 @@
   window.mudarAba = function(aba) {
     document.getElementById("aba-estoque").style.display = aba === 'estoque' ? 'block' : 'none';
     document.getElementById("aba-vendas").style.display = aba === 'vendas' ? 'block' : 'none';
+    document.getElementById("aba-gastos").style.display = aba === 'gastos' ? 'block' : 'none';
     document.getElementById("aba-envio").style.display = aba === 'envio' ? 'block' : 'none';
     
     document.getElementById("btn-tab-estoque").classList.toggle("active", aba === 'estoque');
     document.getElementById("btn-tab-vendas").classList.toggle("active", aba === 'vendas');
+    document.getElementById("btn-tab-gastos").classList.toggle("active", aba === 'gastos');
     document.getElementById("btn-tab-envio").classList.toggle("active", aba === 'envio');
   };
 
@@ -759,6 +933,7 @@
     if (confirm("Deseja zerar TODOS os dados salvos na nuvem?")) {
       produtos = [];
       pedidos = [];
+      gastos = [];
       salvarNuvem();
     }
   };
