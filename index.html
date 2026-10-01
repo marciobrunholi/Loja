@@ -187,7 +187,7 @@
         <select id="select-produto-op" onchange="atualizarPrecoVendaSugerido()"></select>
       </div>
       <div class="form-group">
-        <label>Canal de Venda</label>
+        <label>Canal de Venda / Devolução</label>
         <select id="canal-venda">
           <option value="TikTok">TikTok Shop (A Receber)</option>
           <option value="Loja Física">Loja Física (Recebido em Caixa)</option>
@@ -878,7 +878,7 @@
     alert(`✅ Venda de ${qtd} un. (${canal}) registrada com sucesso!`);
   };
 
-  // Devolução com Validação
+  // DEVOLUÇÃO COM ESTORNO OBRIGATÓRIO DE 'A RECEBER'
   window.registrarDevolucao = function() {
     if (produtos.length === 0) return;
 
@@ -889,21 +889,37 @@
 
     if (!p) return;
 
-    let vendasCandidatas = pedidos.filter(ped => ped.produto === p.nome && ped.tamanho === p.tamanho && ped.canal === canal && ped.qtd > 0);
-    let totalQtdVendidaNoCanal = vendasCandidatas.reduce((sum, ped) => sum + ped.qtd, 0);
+    // Busca vendas A RECEBER prioritariamente para realizar o estorno
+    let vendasAReceber = pedidos.filter(ped => ped.produto === p.nome && ped.tamanho === p.tamanho && ped.canal === canal && ped.statusPgto === "A Receber" && ped.qtd > 0);
+    let totalAReceberCanal = vendasAReceber.reduce((sum, ped) => sum + ped.qtd, 0);
 
-    if (totalQtdVendidaNoCanal < qtdDevolver) {
-      alert(`❌ Erro na devolução! Constam apenas ${totalQtdVendidaNoCanal} unidade(s) vendidas no canal '${canal}' para este item.`);
+    // Se não tiver A Receber suficiente, busca qualquer venda no canal
+    let vendasTotaisCanal = pedidos.filter(ped => ped.produto === p.nome && ped.tamanho === p.tamanho && ped.canal === canal && ped.qtd > 0);
+    let totalVendidaCanal = vendasTotaisCanal.reduce((sum, ped) => sum + ped.qtd, 0);
+
+    if (totalVendidaCanal < qtdDevolver) {
+      alert(`❌ Erro na devolução! Constam apenas ${totalVendidaCanal} unidade(s) vendidas no canal '${canal}' para este item.`);
       return;
     }
 
     let qtdRestanteParaAbater = qtdDevolver;
 
-    for (let ped of vendasCandidatas) {
+    // 1º Abate obrigatoriamente das vendas 'A Receber'
+    for (let ped of vendasAReceber) {
       if (qtdRestanteParaAbater <= 0) break;
       let abate = Math.min(ped.qtd, qtdRestanteParaAbater);
       ped.qtd -= abate;
       qtdRestanteParaAbater -= abate;
+    }
+
+    // 2º Se ainda sobrar devolução, abate das demais vendas do canal
+    if (qtdRestanteParaAbater > 0) {
+      for (let ped of vendasTotaisCanal) {
+        if (qtdRestanteParaAbater <= 0) break;
+        let abate = Math.min(ped.qtd, qtdRestanteParaAbater);
+        ped.qtd -= abate;
+        qtdRestanteParaAbater -= abate;
+      }
     }
 
     pedidos = pedidos.filter(ped => ped.qtd > 0);
@@ -912,10 +928,10 @@
     p.devolucoes += qtdDevolver;
 
     salvarNuvem();
-    alert(`✅ Devolução de ${qtdDevolver} un. (${canal}) registrada com sucesso!`);
+    alert(`✅ Devolução de ${qtdDevolver} un. (${canal}) registrada com estorno OBRIGATÓRIO dos valores A RECEBER!`);
   };
 
-  // Lançar Repasse Diário Exato (Dedução por Valor)
+  // Lançar Repasse Diário Exato
   window.lancarRepassePlataforma = function() {
     let plataforma = document.getElementById("repasse-plataforma").value;
     let valorRepasse = parseFloat(document.getElementById("repasse-valor").value);
@@ -941,17 +957,14 @@
       let totalPed = ped.qtd * ped.precoUnitario;
 
       if (valorRestante >= totalPed) {
-        // Recebeu este pedido por completo
         ped.statusPgto = "Recebido";
         valorRestante -= totalPed;
       } else {
-        // Recebimento Parcial do Pedido: Desmembra o pedido proporcionalmente
         let qtdPaga = Math.floor(valorRestante / ped.precoUnitario);
         if (qtdPaga > 0) {
           let qtdRestante = ped.qtd - qtdPaga;
-          ped.qtd = qtdRestante; // Mantém a sobra A Receber
+          ped.qtd = qtdRestante;
 
-          // Cria o novo pedido fracionado como Recebido
           pedidos.unshift({
             id: Math.floor(1000 + Math.random() * 9000),
             data: ped.data,
@@ -1038,7 +1051,6 @@
       if (qtdRecebida === ped.qtd) {
         ped.statusPgto = "Recebido";
       } else {
-        // Desmembra parcial
         ped.qtd -= qtdRecebida;
         pedidos.unshift({
           id: Math.floor(1000 + Math.random() * 9000),
@@ -1061,7 +1073,7 @@
     salvarNuvem();
   };
 
-  // EDITAR VENDA COM OPÇÕES INTERATIVAS E DESMEMBRAMENTO DE PEÇAS
+  // Editar Venda Completa
   window.editarVenda = function(idx) {
     let ped = pedidos[idx];
     if (!ped) return;
@@ -1074,7 +1086,6 @@
     if (novoPrecoStr === null) return;
     let novoPreco = parseFloat(novoPrecoStr);
 
-    // Seleção interativa do Canal
     let optCanal = prompt("Escolha o Canal de Venda:\n[1] TikTok Shop\n[2] Loja Física\n[3] Shopee\n[4] Outro", "1");
     let canalSel = ped.canal;
     if (optCanal === "1") canalSel = "TikTok";
@@ -1082,17 +1093,14 @@
     else if (optCanal === "3") canalSel = "Shopee";
     else if (optCanal === "4") canalSel = "Outro";
 
-    // Seleção interativa do Status de Pagamento
     let optPgto = prompt("Escolha o Status de Pagamento:\n[1] A Receber\n[2] Recebido", ped.statusPgto === "Recebido" ? "2" : "1");
     let statusSel = optPgto === "2" ? "Recebido" : "A Receber";
 
-    // Se o usuário alterou o status para 'Recebido' e havia mais de 1 peça, verifica se foi recebimento parcial
     if (ped.statusPgto === "A Receber" && statusSel === "Recebido" && novaQtd > 1) {
       let respParcial = prompt(`Você marcou como RECEBIDO.\nDas ${novaQtd} peças lançadas, quantas foram pagas agora?`, novaQtd);
       if (respParcial !== null) {
         let qtdPaga = parseInt(respParcial);
         if (!isNaN(qtdPaga) && qtdPaga > 0 && qtdPaga < novaQtd) {
-          // Desmembra em dois: Paga parcial e mantem o restante A Receber
           let qtdSobra = novaQtd - qtdPaga;
           ped.qtd = qtdSobra;
           ped.precoUnitario = !isNaN(novoPreco) ? novoPreco : ped.precoUnitario;
