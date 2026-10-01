@@ -819,7 +819,7 @@
     alert(`✅ ${estoqueIni} peça(s) salva(s) no estoque!`);
   };
 
-  // EDITAR PRODUTO NO ESTOQUE DETALHADO
+  // Editar Produto no Estoque
   window.editarProdutoEstoque = function(idx) {
     let p = produtos[idx];
     if (!p) return;
@@ -915,7 +915,7 @@
     alert(`✅ Devolução de ${qtdDevolver} un. (${canal}) registrada com sucesso!`);
   };
 
-  // Lançar Repasse com Validação de Excesso
+  // Lançar Repasse Diário Exato (Dedução por Valor)
   window.lancarRepassePlataforma = function() {
     let plataforma = document.getElementById("repasse-plataforma").value;
     let valorRepasse = parseFloat(document.getElementById("repasse-valor").value);
@@ -937,13 +937,34 @@
 
     for (let ped of pendentes) {
       if (valorRestante <= 0) break;
+
       let totalPed = ped.qtd * ped.precoUnitario;
 
       if (valorRestante >= totalPed) {
+        // Recebeu este pedido por completo
         ped.statusPgto = "Recebido";
         valorRestante -= totalPed;
       } else {
-        ped.statusPgto = "Recebido";
+        // Recebimento Parcial do Pedido: Desmembra o pedido proporcionalmente
+        let qtdPaga = Math.floor(valorRestante / ped.precoUnitario);
+        if (qtdPaga > 0) {
+          let qtdRestante = ped.qtd - qtdPaga;
+          ped.qtd = qtdRestante; // Mantém a sobra A Receber
+
+          // Cria o novo pedido fracionado como Recebido
+          pedidos.unshift({
+            id: Math.floor(1000 + Math.random() * 9000),
+            data: ped.data,
+            produto: ped.produto,
+            tamanho: ped.tamanho,
+            canal: ped.canal,
+            qtd: qtdPaga,
+            precoUnitario: ped.precoUnitario,
+            custoUnitario: ped.custoUnitario,
+            statusPgto: "Recebido",
+            statusEnvio: ped.statusEnvio
+          });
+        }
         valorRestante = 0;
       }
     }
@@ -1002,36 +1023,108 @@
 
   window.darBaixaPagamento = function(idx) {
     let ped = pedidos[idx];
-    if (confirm(`Confirmar o recebimento de R$ ${(ped.qtd * ped.precoUnitario).toFixed(2)} referente ao pedido #${ped.id} (${ped.canal})?`)) {
-      ped.statusPgto = "Recebido";
-      salvarNuvem();
+    if (!ped) return;
+
+    if (ped.qtd > 1) {
+      let resp = prompt(`Pedido #${ped.id} possui ${ped.qtd} peças A RECEBER.\n\nQuantas peças foram recebidas agora? (Digite entre 1 e ${ped.qtd}):`, ped.qtd);
+      if (resp === null) return;
+
+      let qtdRecebida = parseInt(resp);
+      if (isNaN(qtdRecebida) || qtdRecebida <= 0 || qtdRecebida > ped.qtd) {
+        alert("Quantidade inválida.");
+        return;
+      }
+
+      if (qtdRecebida === ped.qtd) {
+        ped.statusPgto = "Recebido";
+      } else {
+        // Desmembra parcial
+        ped.qtd -= qtdRecebida;
+        pedidos.unshift({
+          id: Math.floor(1000 + Math.random() * 9000),
+          data: ped.data,
+          produto: ped.produto,
+          tamanho: ped.tamanho,
+          canal: ped.canal,
+          qtd: qtdRecebida,
+          precoUnitario: ped.precoUnitario,
+          custoUnitario: ped.custoUnitario,
+          statusPgto: "Recebido",
+          statusEnvio: ped.statusEnvio
+        });
+      }
+    } else {
+      if (confirm(`Confirmar o recebimento de R$ ${(ped.qtd * ped.precoUnitario).toFixed(2)} referente ao pedido #${ped.id} (${ped.canal})?`)) {
+        ped.statusPgto = "Recebido";
+      }
     }
+    salvarNuvem();
   };
 
-  // EDITAR VENDA COMPLETA (Qtd, Preço, Canal, Status de Pagamento)
+  // EDITAR VENDA COM OPÇÕES INTERATIVAS E DESMEMBRAMENTO DE PEÇAS
   window.editarVenda = function(idx) {
     let ped = pedidos[idx];
     if (!ped) return;
 
-    let novaQtd = prompt(`Editar Quantidade de Peças da Venda #${ped.id}:`, ped.qtd);
-    if (novaQtd === null) return;
+    let novaQtdStr = prompt(`Quantidade de peças neste lote (Atualmente ${ped.qtd} un.):`, ped.qtd);
+    if (novaQtdStr === null) return;
+    let novaQtd = parseInt(novaQtdStr);
 
-    let novoPreco = prompt(`Editar Preço Unitário Praticado (R$):`, ped.precoUnitario);
-    if (novoPreco === null) return;
+    let novoPrecoStr = prompt(`Preço Unitário de Venda (Atualmente R$ ${ped.precoUnitario.toFixed(2)}):`, ped.precoUnitario);
+    if (novoPrecoStr === null) return;
+    let novoPreco = parseFloat(novoPrecoStr);
 
-    let novoCanal = prompt("Editar Canal de Venda (TikTok, Loja Física, Shopee, Outro):", ped.canal);
-    if (novoCanal === null) return;
+    // Seleção interativa do Canal
+    let optCanal = prompt("Escolha o Canal de Venda:\n[1] TikTok Shop\n[2] Loja Física\n[3] Shopee\n[4] Outro", "1");
+    let canalSel = ped.canal;
+    if (optCanal === "1") canalSel = "TikTok";
+    else if (optCanal === "2") canalSel = "Loja Física";
+    else if (optCanal === "3") canalSel = "Shopee";
+    else if (optCanal === "4") canalSel = "Outro";
 
-    let novoStatusPgto = prompt("Editar Status de Pagamento (A Receber / Recebido):", ped.statusPgto);
-    if (novoStatusPgto === null) return;
+    // Seleção interativa do Status de Pagamento
+    let optPgto = prompt("Escolha o Status de Pagamento:\n[1] A Receber\n[2] Recebido", ped.statusPgto === "Recebido" ? "2" : "1");
+    let statusSel = optPgto === "2" ? "Recebido" : "A Receber";
 
-    ped.qtd = parseInt(novaQtd) > 0 ? parseInt(novaQtd) : ped.qtd;
-    ped.precoUnitario = parseFloat(novoPreco) >= 0 ? parseFloat(novoPreco) : ped.precoUnitario;
-    ped.canal = novoCanal.trim();
-    ped.statusPgto = novoStatusPgto.trim();
+    // Se o usuário alterou o status para 'Recebido' e havia mais de 1 peça, verifica se foi recebimento parcial
+    if (ped.statusPgto === "A Receber" && statusSel === "Recebido" && novaQtd > 1) {
+      let respParcial = prompt(`Você marcou como RECEBIDO.\nDas ${novaQtd} peças lançadas, quantas foram pagas agora?`, novaQtd);
+      if (respParcial !== null) {
+        let qtdPaga = parseInt(respParcial);
+        if (!isNaN(qtdPaga) && qtdPaga > 0 && qtdPaga < novaQtd) {
+          // Desmembra em dois: Paga parcial e mantem o restante A Receber
+          let qtdSobra = novaQtd - qtdPaga;
+          ped.qtd = qtdSobra;
+          ped.precoUnitario = !isNaN(novoPreco) ? novoPreco : ped.precoUnitario;
+          ped.canal = canalSel;
+
+          pedidos.unshift({
+            id: Math.floor(1000 + Math.random() * 9000),
+            data: ped.data,
+            produto: ped.produto,
+            tamanho: ped.tamanho,
+            canal: canalSel,
+            qtd: qtdPaga,
+            precoUnitario: !isNaN(novoPreco) ? novoPreco : ped.precoUnitario,
+            custoUnitario: ped.custoUnitario,
+            statusPgto: "Recebido",
+            statusEnvio: ped.statusEnvio
+          });
+
+          salvarNuvem();
+          alert(`✅ Venda reordenada: ${qtdPaga} un. marcadas como RECEBIDAS e ${qtdSobra} un. mantidas A RECEBER!`);
+          return;
+        }
+      }
+    }
+
+    ped.qtd = (!isNaN(novaQtd) && novaQtd > 0) ? novaQtd : ped.qtd;
+    ped.precoUnitario = (!isNaN(novoPreco) && novoPreco >= 0) ? novoPreco : ped.precoUnitario;
+    ped.canal = canalSel;
+    ped.statusPgto = statusSel;
 
     salvarNuvem();
-    alert("✅ Venda e valores de caixa/a receber atualizados!");
+    alert("✅ Lançamento de venda atualizado com sucesso!");
   };
 
   window.marcarEnviado = function(idx) {
