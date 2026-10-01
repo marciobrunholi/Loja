@@ -266,7 +266,7 @@
               <th>Devolvidos</th>
               <th>Custo Un.</th>
               <th>Preço Padrão</th>
-              <th>Ação</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody id="tabela-estoque-corpo"></tbody>
@@ -517,7 +517,6 @@
     let totalGastos = gastos.reduce((sum, g) => sum + g.valor, 0);
     let totalAReceber = aReceberTikTok + aReceberShopee + aReceberOutros;
 
-    // Caixa Real Líquido = Entradas em Caixa - Despesas Operacionais
     let caixaLiquidoReal = valorRecebido - totalGastos;
     let bannerCaixa = document.getElementById("banner-caixa-negativo");
 
@@ -561,7 +560,6 @@
     }
 
     produtos.forEach((p, idx) => {
-      // Contagem de vendas por canal
       let vTikTok = 0, vLoja = 0, vShopee = 0, vOutro = 0;
       pedidos.filter(ped => ped.produto === p.nome && ped.tamanho === p.tamanho).forEach(ped => {
         if (ped.canal === "TikTok") vTikTok += ped.qtd;
@@ -589,7 +587,10 @@
         <td>R$ ${p.custo.toFixed(2)}</td>
         <td>R$ ${p.preco.toFixed(2)}</td>
         <td>
-          <button class="btn-danger btn-xs" onclick="window.excluirQuantidade(${idx})">Excluir</button>
+          <div style="display:flex; gap:4px;">
+            <button class="btn-warning btn-xs" onclick="window.editarProdutoEstoque(${idx})">Editar</button>
+            <button class="btn-danger btn-xs" onclick="window.excluirQuantidade(${idx})">Excluir</button>
+          </div>
         </td>
       `;
       tbody.appendChild(tr);
@@ -599,7 +600,10 @@
       card.innerHTML = `
         <div class="mobile-item-header">
           <div><b>${p.nome}</b> <span class="badge badge-blue">${p.tamanho}</span> ${badgeEstoque}</div>
-          <button class="btn-danger btn-xs" onclick="window.excluirQuantidade(${idx})">Excluir</button>
+          <div>
+            <button class="btn-warning btn-xs" onclick="window.editarProdutoEstoque(${idx})">Editar</button>
+            <button class="btn-danger btn-xs" onclick="window.excluirQuantidade(${idx})">Excluir</button>
+          </div>
         </div>
         <div class="mobile-row"><span>Estoque Atual:</span> <b>${p.estoque} peças</b></div>
         <div class="mobile-row"><span>Vendas por Canal:</span> <b>TikTok:${vTikTok} | Loja:${vLoja} | Shopee:${vShopee}</b></div>
@@ -815,6 +819,28 @@
     alert(`✅ ${estoqueIni} peça(s) salva(s) no estoque!`);
   };
 
+  // EDITAR PRODUTO NO ESTOQUE DETALHADO
+  window.editarProdutoEstoque = function(idx) {
+    let p = produtos[idx];
+    if (!p) return;
+
+    let novoPreco = prompt(`Editar Preço Padrão de Revenda para '${p.nome}' (${p.tamanho}):`, p.preco);
+    if (novoPreco === null) return;
+
+    let novoCusto = prompt(`Editar Custo de Compra Unitário (R$):`, p.custo);
+    if (novoCusto === null) return;
+
+    let novoEstoque = prompt(`Editar Quantidade Atual em Estoque (Peças):`, p.estoque);
+    if (novoEstoque === null) return;
+
+    p.preco = parseFloat(novoPreco) || p.preco;
+    p.custo = parseFloat(novoCusto) || p.custo;
+    p.estoque = parseInt(novoEstoque) >= 0 ? parseInt(novoEstoque) : p.estoque;
+
+    salvarNuvem();
+    alert("✅ Dados do produto no estoque atualizados!");
+  };
+
   // Registrar Venda
   window.registrarVenda = function() {
     if (produtos.length === 0) return;
@@ -902,7 +928,6 @@
     let pendentes = pedidos.filter(ped => ped.canal === plataforma && ped.statusPgto === "A Receber");
     let saldoPendentePlataforma = pendentes.reduce((sum, ped) => sum + (ped.qtd * ped.precoUnitario), 0);
 
-    // Conferencia de Segurança
     if (valorRepasse > saldoPendentePlataforma) {
       alert(`🛑 BLOQUEADO: O valor lançado (R$ ${valorRepasse.toFixed(2)}) é MAIOR que o saldo total a receber da plataforma '${plataforma}' (R$ ${saldoPendentePlataforma.toFixed(2)}).`);
       return;
@@ -983,25 +1008,30 @@
     }
   };
 
+  // EDITAR VENDA COMPLETA (Qtd, Preço, Canal, Status de Pagamento)
   window.editarVenda = function(idx) {
     let ped = pedidos[idx];
     if (!ped) return;
 
-    let novoCanal = prompt("Editar Canal (TikTok, Loja Física, Shopee, Outro):", ped.canal);
-    if (novoCanal === null) return;
+    let novaQtd = prompt(`Editar Quantidade de Peças da Venda #${ped.id}:`, ped.qtd);
+    if (novaQtd === null) return;
 
-    let novoPreco = prompt("Editar Preço Unitário (R$):", ped.precoUnitario);
+    let novoPreco = prompt(`Editar Preço Unitário Praticado (R$):`, ped.precoUnitario);
     if (novoPreco === null) return;
+
+    let novoCanal = prompt("Editar Canal de Venda (TikTok, Loja Física, Shopee, Outro):", ped.canal);
+    if (novoCanal === null) return;
 
     let novoStatusPgto = prompt("Editar Status de Pagamento (A Receber / Recebido):", ped.statusPgto);
     if (novoStatusPgto === null) return;
 
+    ped.qtd = parseInt(novaQtd) > 0 ? parseInt(novaQtd) : ped.qtd;
+    ped.precoUnitario = parseFloat(novoPreco) >= 0 ? parseFloat(novoPreco) : ped.precoUnitario;
     ped.canal = novoCanal.trim();
-    ped.precoUnitario = parseFloat(novoPreco) || ped.precoUnitario;
     ped.statusPgto = novoStatusPgto.trim();
 
     salvarNuvem();
-    alert("✅ Venda atualizada!");
+    alert("✅ Venda e valores de caixa/a receber atualizados!");
   };
 
   window.marcarEnviado = function(idx) {
